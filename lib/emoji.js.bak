@@ -61,7 +61,7 @@ const loadEmojis = async client => {
     const appId = client.user?.id;
 
     if (!token || !appId || !fs.existsSync(dir)) {
-        console.log(
+        global.loglog(
             `Emoji loader skipped: token=${!!token} app=${appId} dir=${fs.existsSync(dir)}`
         );
         return;
@@ -87,7 +87,7 @@ const loadEmojis = async client => {
         );
 
         if (!res.ok) {
-            console.error(
+            global.log.error(
                 `Emoji list failed: ${res.status}`,
                 await res.text()
             );
@@ -96,9 +96,9 @@ const loadEmojis = async client => {
 
         existing = (await res.json()).items ?? [];
 
-        console.log(`Found ${existing.length} existing emojis.`);
+        global.loglog(`Found ${existing.length} existing emojis.`);
     } catch (err) {
-        console.error("Emoji list error:", err.message);
+        global.log.error("Emoji list error:", err.message);
         return;
     }
 
@@ -121,15 +121,15 @@ const loadEmojis = async client => {
             );
 
             if (!res.ok) {
-                console.error(
+                global.log.error(
                     `Failed deleting ${emoji.name}:`,
                     await res.text()
                 );
             } else {
-                console.log(`Deleted emoji: ${emoji.name}`);
+                global.loglog(`Deleted emoji: ${emoji.name}`);
             }
         } catch (err) {
-            console.error(
+            global.log.error(
                 `Delete failed: ${emoji.name}`,
                 err.message
             );
@@ -146,7 +146,7 @@ const loadEmojis = async client => {
         .readdirSync(dir)
         .filter(file => MIME[path.extname(file).toLowerCase()]);
 
-    console.log(`Uploading ${files.length} emojis...`);
+    global.loglog(`Uploading ${files.length} emojis...`);
 
     const uploaded = [];
 
@@ -176,7 +176,7 @@ const loadEmojis = async client => {
             const data = await res.json();
 
             if (!res.ok) {
-                console.error(
+                global.log.error(
                     `Emoji failed: ${file}`,
                     data
                 );
@@ -185,11 +185,11 @@ const loadEmojis = async client => {
 
             uploaded.push(data);
 
-            console.log(
+            global.loglog(
                 `Uploaded: ${name} (${data.id})`
             );
         } catch (err) {
-            console.error(
+            global.log.error(
                 `Emoji failed: ${file}`,
                 err.message
             );
@@ -230,7 +230,7 @@ const loadEmojis = async client => {
         }
     }
 
-    console.log(
+    global.loglog(
         `Emoji loader complete: ${uploaded.length} uploaded.`
     );
 };

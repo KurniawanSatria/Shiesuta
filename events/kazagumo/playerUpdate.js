@@ -1,5 +1,5 @@
-const state = require("../lib/state");
-const { nowPlayingCard } = require("../lib/ui");
+const state = require("../../lib/state");
+const { nowPlayingCard } = require("../../lib/ui");
 
 module.exports = {
     name: "playerUpdate",
@@ -12,6 +12,7 @@ module.exports = {
         if (!st || player.paused) return;
         if (!st.lines?.length) return;
         const i = st.lines.findLastIndex(line => line.time <= position);
+        global.log.debug(`[${player.guildId}] Lyrics, index: ${i}, position: ${position}, duration: ${st.track?.duration ?? 0}, requested: ${st.requester?.tag ?? 'Unknown'}, lyrics: ${st.lines?.length ?? 0}`);
         if (i === -1 || i === st.last) return;
         st.last = i;
         st.msg.edit(nowPlayingCard(guildId, st.track, st.requester, st.lines, position)).catch(() => { });

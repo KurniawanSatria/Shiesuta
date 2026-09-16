@@ -1,8 +1,7 @@
 const { Events } = require("discord.js");
-const { card } = require("../lib/ui");
-const { clearIdle } = require("../lib/utils");
-const { T } = require("../lib/i18n");
-const cfg = require("../config.json");
+const { clearIdle } = require("../../lib/utils");
+const { T } = require("../../lib/i18n");
+const cfg = require("../../config.json");
 const PREFIX = cfg.prefix ?? ".";
 
 const ALIASES = {
@@ -20,15 +19,17 @@ module.exports = {
     name: Events.MessageCreate,
     emitter: "client",
     async run(ctx, m) {
+        if (!m.guild) return;
         if (m.author.bot || !m.content.startsWith(PREFIX)) return;
         const [raw, ...args] = m.content.slice(PREFIX.length).trim().split(/\s+/);
         const cmd = ALIASES[raw?.toLowerCase()];
         if (!cmd) return;
         const command = ctx.commands.get(cmd);
         if (!command) return;
-        if (m.guild) clearIdle(m.guild.id);
-        const player = ctx.kazagumo.players.get(m.guild?.id);
-        const t = T(m.guild?.id);
-        await command.run(m, args, { ...ctx, player, t }).catch(e => console.error(`Command ${cmd}:`, e));
+        clearIdle(m.guild.id);
+        const player = ctx.kazagumo.players.get(m.guild.id);
+        const t = T(m.guild.id);
+        await command.run(m, args, { ...ctx, player, t }).catch(e => global.log.error(`Command ${cmd}:`, e));
+        if (cfg.cleanMode) setTimeout(() => m.delete().catch(() => { }), 5000);
     }
 };

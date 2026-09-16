@@ -47,3 +47,7 @@ config.json
 
 # agent
 .agents/*
+
+## Bun
+.bun/*
+bun.lock

@@ -1,12 +1,14 @@
-const { T } = require("../lib/i18n");
-const { nowPlayingCard } = require("../lib/ui");
-const { purge, clearIdle, fetchLyrics, parseLrc } = require("../lib/utils");
-const state = require("../lib/state");
+const { T } = require("../../lib/i18n");
+const { nowPlayingCard } = require("../../lib/ui");
+const { purge, clearIdle, fetchLyrics, parseLrc } = require("../../lib/utils");
+const state = require("../../lib/state");
 
 module.exports = {
     name: "playerStart",
     emitter: "kazagumo",
     async run(ctx, player, track) {
+        ctx.client.activePlayers.set(player.guildId, player);
+        global.log.debug(`[${player.guildId}] playing ${track.title}`);
         clearIdle(player.guildId);
         await purge(player.guildId);
         const channel = player.textId ? ctx.client.channels.cache.get(player.textId) : null;

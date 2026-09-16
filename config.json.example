@@ -1,7 +1,8 @@
 {
-	"token": "YOUR_BOT_TOKEN", // get it from https://discord.com/developers/applications/YOUR_APPLICATION/bot
+	"token": "YOUR_BOT_TOKEN",
 	"prefix": ".",
 	"defaultLang": "en",
+	"cleanMode": false,
 	"nodes": [
 		{
 			"name": "main",
@@ -11,8 +12,8 @@
 		}
 	],
 	"spotify": {
-		"clientId": "YOUR_SPOTIFY_CLIENT_ID",  // get it from 
-		"clientSecret": "YOUR_SPOTIFY_CLIENT_SECRET",  // get it from https://developer.spotify.com/dashboard/YOUR_APPLICATION
+		"clientId": "YOUR_SPOTIFY_CLIENT_ID",
+		"clientSecret": "YOUR_SPOTIFY_CLIENT_SECRET",
 		"searchMarket": "ID"
 	},
 	"donate": {
