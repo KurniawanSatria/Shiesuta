@@ -114,15 +114,6 @@ body {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
 .legal h2 {
   font-size: 1.25rem;
   font-weight: 600;
@@ -158,4 +149,8 @@ body {
   background: var(--color-base-200);
   padding: 0.1rem 0.35rem;
   border-radius: 0.35rem;
+}
+
+.aura.w-full {
+  display: block;
 }
