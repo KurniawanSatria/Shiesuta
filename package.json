@@ -1,0 +1,40 @@
+{
+  "name": "Shiesuta",
+  "version": "1.0.0",
+  "description": "A Discord music bot powered by Kazagumo and Lavalink.",
+  "keywords": [
+    "discord",
+    "discord-bot",
+    "music",
+    "lavalink",
+    "kazagumo",
+    "spotify"
+  ],
+  "homepage": "https://github.com/KurniawanSatria/Shiesuta",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KurniawanSatria/Shiesuta.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KurniawanSatria/Shiesuta/issues"
+  },
+  "license": "MIT",
+  "author": "KurniawanSatria",
+  "private": false,
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "bun index.js",
+    "dev": "bun --watch index.js"
+  },
+  "engines": {
+    "bun": ">=1.2.0"
+  },
+  "dependencies": {
+    "@discordjs/voice": "^0.19.2",
+    "discord.js": "^14.27.0",
+    "kazagumo": "^3.4.3",
+    "kazagumo-spotify": "^2.1.1",
+    "shoukaku": "^4.1.0"
+  }
+}

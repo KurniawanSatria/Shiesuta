@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" translate="no">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <script>
+        try {
+            const t = localStorage.getItem('theme');
+            if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+            else if (matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.dataset.theme = 'dark';
+        } catch { }
+    </script>
+
+    <title>Privacy Policy — Shiesuta</title>
+    <meta name="description" content="Privacy Policy for Shiesuta Discord music bot." />
+    <meta property="og:title" content="Privacy Policy — Shiesuta" />
+    <meta property="og:description" content="Privacy Policy for Shiesuta Discord music bot." />
+    <meta property="og:type" content="website" />
+
+    <link rel="icon" href="favicon.png" type="image/png" sizes="any" />
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5/daisyui.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="theme.css" />
+</head>
+
+<body class="bg-base-100 text-base-content min-h-screen flex flex-col">
+
+    <header class="navbar sticky top-0 z-50 bg-base-100/80 backdrop-blur-lg border-b border-base-300">
+        <div class="navbar-start">
+            <a href="index.html" class="btn btn-ghost text-xl font-bold gap-2 px-2">
+                <img src="favicon.png" alt="" class="w-7 h-7 rounded-lg" />
+                <span class="text-gradient">Shiesuta</span>
+            </a>
+        </div>
+        <div class="navbar-end gap-2">
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle" aria-label="Change theme">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3a9 9 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                    </svg>
+                </div>
+                <ul tabindex="0"
+                    class="dropdown-content bg-base-200 rounded-box z-50 w-40 p-2 shadow-xl flex flex-col gap-1">
+                    <li>
+                        <label class="label cursor-pointer justify-start gap-3 rounded-lg px-3 py-2">
+                            <input type="radio" name="theme-dropdown" value="light"
+                                class="theme-controller radio radio-primary radio-xs" aria-label="Light theme" />
+                            <span class="label-text">☀️ Light</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="label cursor-pointer justify-start gap-3 rounded-lg px-3 py-2">
+                            <input type="radio" name="theme-dropdown" value="dark"
+                                class="theme-controller radio radio-primary radio-xs" aria-label="Dark theme" />
+                            <span class="label-text">🌙 Dark</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+            <a href="index.html" class="btn btn-ghost btn-sm">← Back to Home</a>
+        </div>
+    </header>
+
+    <main class="flex-1">
+        <div class="container mx-auto px-4 py-12 max-w-3xl legal">
+            <div class="badge badge-primary badge-soft mb-3">Legal</div>
+            <h1 class="text-4xl font-bold mb-2">Privacy Policy</h1>
+            <p class="opacity-60 text-sm mb-8">Last updated: September 16, 2026</p>
+
+            <h2>1. Introduction</h2>
+            <p>Shiesuta ("us", "we", or "our") operates the Shiesuta Discord bot (the "Bot"). This Privacy Policy
+                describes
+                how we collect, use, and disclose your information when you use the Bot, and tells you about your
+                privacy
+                rights.</p>
+            <p>We do not sell personal information and we do not share it with third parties for their own marketing
+                purposes. We only use data as needed to operate the Bot and comply with applicable law.</p>
+
+            <h2>2. Information We Collect</h2>
+            <p>We may collect information from you in the following ways:</p>
+            <ul>
+                <li><strong>Discord Account Information:</strong> When you invite the Bot to a server, Discord shares
+                    certain
+                    information with us, including your Discord user ID, username, avatar, and the servers you belong
+                    to. This
+                    is provided by Discord's OAuth2 flow and APIs.</li>
+                <li><strong>Voice &amp; Message Data:</strong> The Bot receives voice channel membership, message
+                    content
+                    (prefix commands), and track requests in order to play music. This data is processed in real-time
+                    and is not
+                    permanently stored by the Bot.</li>
+                <li><strong>Log Data:</strong> We may collect technical information such as IP addresses, device
+                    information,
+                    and error logs. This is typically handled by the hosting provider (e.g., the runtime environment
+                    where the
+                    Bot is deployed) and is used for operational and debugging purposes.</li>
+            </ul>
+            <p>We do not store any personal data beyond what is necessary for the Bot to function. No data is retained
+                once
+                the Bot is restarted unless explicitly needed for configuration (e.g., language preference per guild,
+                stored
+                only in memory).</p>
+
+            <h2>3. How We Use Your Information</h2>
+            <p>We use the collected information to:</p>
+            <ul>
+                <li>Operate, monitor, and maintain the Bot.</li>
+                <li>Respond to your commands and provide the music playback service.</li>
+                <li>Diagnose and fix errors or performance issues.</li>
+                <li>Comply with legal obligations and enforce our policies.</li>
+            </ul>
+
+            <h2>4. Data Retention</h2>
+            <p>The Bot does not permanently store personal data. Guild-specific settings such as language preference are
+                held in memory only and are lost when the Bot restarts. No data is sold, traded, or transferred to third
+                parties.</p>
+
+            <h2>5. Third-Party Services</h2>
+            <p>The Bot integrates with:</p>
+            <ul>
+                <li><strong>Discord:</strong> We interact with Discord APIs to receive commands and play audio. See the
+                    <a href="https://discord.com/privacy">Discord Privacy Policy</a>.
+                </li>
+                <li><strong>Lavalink:</strong> The Bot connects to a Lavalink server for audio streaming. Audio data
+                    flows
+                    through Lavalink and Discord's voice infrastructure.</li>
+                <li><strong>Spotify:</strong> If configured, the Bot may use Spotify's API to resolve playlist and album
+                    metadata. See the <a href="https://www.spotify.com/legal/privacy-policy">Spotify Privacy Policy</a>.
+                </li>
+                <li><strong>YouTube / SoundCloud:</strong> The Bot may fetch track metadata from these services to
+                    display
+                    now-playing information.</li>
+            </ul>
+            <p>These services have their own privacy policies. We are not responsible for the privacy practices of
+                third-party services.</p>
+
+            <h2>6. Your Rights &amp; Choices</h2>
+            <p>You have the right to access, correct, or delete any personal information that is associated with you.
+                Because the Bot does not permanently store personal data, you may request to be forgotten by removing
+                the Bot
+                from your server. If you have questions or concerns about your data, please contact us via the project's
+                GitHub repository.</p>
+            <p>You can opt out of using the Bot at any time by removing it from your server or disabling its commands.
+            </p>
+
+            <h2>7. Children's Privacy</h2>
+            <p>The Bot is not intended for children under 13. We do not knowingly collect personal information from
+                children
+                under 13. If you believe we have collected personal data from a child under 13, please contact us so we
+                can
+                take appropriate steps to delete such information.</p>
+
+            <h2>8. Security</h2>
+            <p>We take reasonable measures to protect the Bot and any transient data from unauthorized access,
+                alteration,
+                or disclosure. However, no method of transmission over the internet or electronic storage is 100%
+                secure. We
+                cannot guarantee absolute security.</p>
+
+            <h2>9. Changes to This Privacy Policy</h2>
+            <p>We may update this Privacy Policy from time to time. We will post any changes on this page with an
+                updated
+                "Last updated" date. Your continued use of the Bot after those changes constitutes acceptance of the
+                revised
+                policy.</p>
+
+            <h2>10. Contact Us</h2>
+            <p>If you have any questions about this Privacy Policy, please contact the bot owner via the project's
+                GitHub
+                repository: <a
+                    href="https://github.com/KurniawanSatria/Shiesuta">https://github.com/KurniawanSatria/Shiesuta</a>.
+            </p>
+
+            <div class="divider mt-10"></div>
+            <p class="text-center text-sm opacity-60">© 2026 Shiesuta. All rights reserved.</p>
+        </div>
+    </main>
+
+    <footer class="footer sm:footer-horizontal bg-base-200 text-base-content border-t border-base-300 p-10">
+        <aside class="max-w-xs">
+            <div class="flex items-center gap-2 mb-2">
+                <img src="favicon.png" alt="" class="w-8 h-8 rounded-lg" />
+                <span class="text-xl font-bold text-gradient">Shiesuta</span>
+            </div>
+            <p class="text-sm opacity-70">A modern Discord music bot.<br />Powered by Kazagumo &amp; Lavalink.</p>
+        </aside>
+        <nav>
+            <h6 class="footer-title">Product</h6>
+            <a class="link link-hover" href="index.html#features">Features</a>
+            <a class="link link-hover" href="index.html#commands">Commands</a>
+            <a class="link link-hover" href="index.html#setup">Setup</a>
+            <a class="link link-hover" href="https://github.com/KurniawanSatria/Shiesuta" target="_blank"
+                rel="noopener">GitHub</a>
+        </nav>
+        <nav>
+            <h6 class="footer-title">Legal</h6>
+            <a class="link link-hover" href="terms.html">Terms of Service</a>
+            <a class="link link-hover" href="privacy.html">Privacy Policy</a>
+        </nav>
+        <nav id="support">
+            <h6 class="footer-title">Support the project</h6>
+            <a class="link link-hover" href="https://trakteer.id/saturiaaa" target="_blank" rel="noopener">🫶
+                Trakteer</a>
+            <a class="link link-hover" href="https://saweria.co/Saturiaaa" target="_blank" rel="noopener">☕ Saweria</a>
+            <a class="link link-hover" href="https://sociabuzz.com/saturiaaa" target="_blank" rel="noopener">💬
+                Sociabuzz</a>
+        </nav>
+    </footer>
+
+    <footer class="footer bg-base-200 border-t border-base-300 py-4 px-10">
+        <p class="text-sm opacity-60 w-full text-center">
+            © 2026 Shiesuta. Made with ❤️ for the Discord community. Licensed under MIT.
+        </p>
+    </footer>
+
+    <script src="site.js"></script>
+</body>
+
+</html>

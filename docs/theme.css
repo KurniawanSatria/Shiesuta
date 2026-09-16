@@ -1,0 +1,161 @@
+:root {
+  --radius-box: 1rem;
+  --radius-field: 0.5rem;
+  --radius-selector: 1rem;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --color-base-100: #ffffff;
+  --color-base-200: #f3eefc;
+  --color-base-300: #e2d6f7;
+  --color-base-content: #1a1730;
+  --color-primary: #7c3aed;
+  --color-primary-content: #ffffff;
+  --color-secondary: #a855f7;
+  --color-secondary-content: #ffffff;
+  --color-accent: #d946ef;
+  --color-accent-content: #ffffff;
+  --color-neutral: #1f1a30;
+  --color-neutral-content: #efe9fb;
+  --color-info: #4f46e5;
+  --color-info-content: #ffffff;
+  --color-success: #15803d;
+  --color-success-content: #ffffff;
+  --color-warning: #d97706;
+  --color-warning-content: #2a1400;
+  --color-error: #dc2626;
+  --color-error-content: #ffffff;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-base-100: #0e0c16;
+  --color-base-200: #16131f;
+  --color-base-300: #211c30;
+  --color-base-content: #e9e6f5;
+  --color-primary: #a78bfa;
+  --color-primary-content: #221e35;
+  --color-secondary: #c084fc;
+  --color-secondary-content: #221e35;
+  --color-accent: #e879f9;
+  --color-accent-content: #221e35;
+  --color-neutral: #2a2440;
+  --color-neutral-content: #e9e6f5;
+  --color-info: #818cf8;
+  --color-info-content: #1e1b4b;
+  --color-success: #4ade80;
+  --color-success-content: #052e16;
+  --color-warning: #fbbf24;
+  --color-warning-content: #3a1d02;
+  --color-error: #f87171;
+  --color-error-content: #450a0a;
+}
+
+body {
+  font-family: 'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.text-gradient {
+  background-image: linear-gradient(120deg, #8b5cf6, #d946ef 55%, #6366f1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+[data-theme="light"] .hero-glow {
+  background:
+    radial-gradient(620px 340px at 15% 8%, rgb(124 58 237 / 0.20), transparent 70%),
+    radial-gradient(560px 320px at 88% 12%, rgb(217 70 239 / 0.16), transparent 70%),
+    radial-gradient(760px 460px at 50% 100%, rgb(99 102 241 / 0.14), transparent 70%);
+}
+
+[data-theme="dark"] .hero-glow {
+  background:
+    radial-gradient(600px 320px at 15% 10%, rgb(168 85 247 / 0.14), transparent 70%),
+    radial-gradient(560px 300px at 85% 15%, rgb(99 102 241 / 0.12), transparent 70%),
+    radial-gradient(720px 420px at 50% 95%, rgb(217 70 239 / 0.10), transparent 70%);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+.float-anim { animation: float 6s ease-in-out infinite; }
+
+@keyframes eq {
+  0%, 100% { height: 4px; }
+  50% { height: 18px; }
+}
+.eq-bar {
+  display: inline-block;
+  width: 3px;
+  background-color: currentColor;
+  border-radius: 9999px;
+  animation: eq 1.2s ease-in-out infinite;
+}
+.eq-bar:nth-child(1) { animation-delay: 0.0s; }
+.eq-bar:nth-child(2) { animation-delay: 0.2s; }
+.eq-bar:nth-child(3) { animation-delay: 0.4s; }
+.eq-bar:nth-child(4) { animation-delay: 0.15s; }
+.eq-bar:nth-child(5) { animation-delay: 0.35s; }
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal 0.7s ease-out backwards;
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(1.5rem); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.legal h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 2.25rem 0 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-base-content) 12%, transparent);
+}
+.legal p {
+  line-height: 1.8;
+  margin-bottom: 0.9rem;
+  color: color-mix(in oklab, var(--color-base-content) 82%, transparent);
+}
+.legal ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin: 0.75rem 0 1rem;
+  display: grid;
+  gap: 0.4rem;
+}
+.legal li {
+  line-height: 1.7;
+  color: color-mix(in oklab, var(--color-base-content) 82%, transparent);
+}
+.legal a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.legal strong { font-weight: 600; color: var(--color-base-content); }
+.legal code {
+  font-family: 'Fira Code', Consolas, monospace;
+  font-size: 0.85em;
+  background: var(--color-base-200);
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.35rem;
+}

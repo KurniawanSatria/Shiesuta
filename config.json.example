@@ -1,0 +1,22 @@
+{
+	"token": "YOUR_BOT_TOKEN", // get it from https://discord.com/developers/applications/YOUR_APPLICATION/bot
+	"prefix": ".",
+	"defaultLang": "en",
+	"nodes": [
+		{
+			"name": "main",
+			"url": "localhost:80",
+			"auth": "youshallnotpass",
+			"secure": false
+		}
+	],
+	"spotify": {
+		"clientId": "YOUR_SPOTIFY_CLIENT_ID",  // get it from 
+		"clientSecret": "YOUR_SPOTIFY_CLIENT_SECRET",  // get it from https://developer.spotify.com/dashboard/YOUR_APPLICATION
+		"searchMarket": "ID"
+	},
+	"donate": {
+		"url": "https://saweria.co/Saturiaaa",
+		"chance": 0.1
+	}
+}

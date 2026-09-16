@@ -1,0 +1,241 @@
+const fs = require("fs");
+const path = require("path");
+
+const DEFAULTS = {
+    music: "🎵",
+    error: "⚠️",
+    success: "✅",
+    user: "👤",
+    time: "⏱️",
+    mic: "🎤",
+    heart: "❤️",
+    play: "▶️",
+    skip: "⏭",
+    pause: "⏸",
+    stop: "⏹",
+    check: "✅",
+    notes: "🎶",
+    arrowL: "◀️",
+    arrowR: "▶"
+};
+
+const ALIAS = {
+    music: "music-record",
+    error: "exclamation-mark",
+    success: "commercial",
+    user: "user",
+    time: "time",
+    mic: "mic",
+    heart: "heart",
+    play: "play",
+    skip: "enter",
+    pause: "multiply",
+    stop: "trash",
+    check: "plus-math",
+    notes: "list",
+    arrowL: "rewind",
+    arrowR: "play"
+};
+
+const EMOJI = { ...DEFAULTS };
+
+const API = "https://discord.com/api/v10";
+
+const MIME = {
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".webp": "image/webp"
+};
+
+const sanitize = name =>
+    name
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, "_")
+        .slice(0, 32);
+
+const loadEmojis = async client => {
+    const dir = path.join(__dirname, "../icons-1");
+    const token = client.token;
+    const appId = client.user?.id;
+
+    if (!token || !appId || !fs.existsSync(dir)) {
+        console.log(
+            `Emoji loader skipped: token=${!!token} app=${appId} dir=${fs.existsSync(dir)}`
+        );
+        return;
+    }
+
+    const headers = {
+        authorization: `Bot ${token}`,
+        "content-type": "application/json"
+    };
+
+    /*
+     * ========================================
+     * 1. AMBIL SEMUA EMOJI YANG SUDAH ADA
+     * ========================================
+     */
+
+    let existing = [];
+
+    try {
+        const res = await fetch(
+            `${API}/applications/${appId}/emojis`,
+            { headers }
+        );
+
+        if (!res.ok) {
+            console.error(
+                `Emoji list failed: ${res.status}`,
+                await res.text()
+            );
+            return;
+        }
+
+        existing = (await res.json()).items ?? [];
+
+        console.log(`Found ${existing.length} existing emojis.`);
+    } catch (err) {
+        console.error("Emoji list error:", err.message);
+        return;
+    }
+
+    /*
+     * ========================================
+     * 2. HAPUS SEMUA EMOJI
+     * ========================================
+     */
+
+    for (const emoji of existing) {
+        if (!emoji.id) continue;
+
+        try {
+            const res = await fetch(
+                `${API}/applications/${appId}/emojis/${emoji.id}`,
+                {
+                    method: "DELETE",
+                    headers
+                }
+            );
+
+            if (!res.ok) {
+                console.error(
+                    `Failed deleting ${emoji.name}:`,
+                    await res.text()
+                );
+            } else {
+                console.log(`Deleted emoji: ${emoji.name}`);
+            }
+        } catch (err) {
+            console.error(
+                `Delete failed: ${emoji.name}`,
+                err.message
+            );
+        }
+    }
+
+    /*
+     * ========================================
+     * 3. UPLOAD SEMUA FILE DARI ../icons
+     * ========================================
+     */
+
+    const files = fs
+        .readdirSync(dir)
+        .filter(file => MIME[path.extname(file).toLowerCase()]);
+
+    console.log(`Uploading ${files.length} emojis...`);
+
+    const uploaded = [];
+
+    for (const file of files) {
+        const ext = path.extname(file).toLowerCase();
+        const name = sanitize(path.parse(file).name);
+
+        const image =
+            `data:${MIME[ext]};base64,` +
+            fs
+                .readFileSync(path.join(dir, file))
+                .toString("base64");
+
+        try {
+            const res = await fetch(
+                `${API}/applications/${appId}/emojis`,
+                {
+                    method: "POST",
+                    headers,
+                    body: JSON.stringify({
+                        name,
+                        image
+                    })
+                }
+            );
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                console.error(
+                    `Emoji failed: ${file}`,
+                    data
+                );
+                continue;
+            }
+
+            uploaded.push(data);
+
+            console.log(
+                `Uploaded: ${name} (${data.id})`
+            );
+        } catch (err) {
+            console.error(
+                `Emoji failed: ${file}`,
+                err.message
+            );
+        }
+    }
+
+    /*
+     * ========================================
+     * 4. MASUKKAN EMOJI KE EMOJI OBJECT
+     * ========================================
+     */
+
+    for (const key of Object.keys(EMOJI)) {
+        delete EMOJI[key];
+    }
+
+    Object.assign(EMOJI, DEFAULTS);
+
+    for (const emoji of uploaded) {
+        if (!emoji.name || !emoji.id) continue;
+
+        EMOJI[emoji.name] = emoji.animated
+            ? `<a:${emoji.name}:${emoji.id}>`
+            : `<:${emoji.name}:${emoji.id}>`;
+    }
+
+    /*
+     * ========================================
+     * 5. APPLY ALIAS
+     * ========================================
+     */
+
+    for (const [key, file] of Object.entries(ALIAS)) {
+        const tag = EMOJI[sanitize(file)];
+
+        if (tag) {
+            EMOJI[key] = tag;
+        }
+    }
+
+    console.log(
+        `Emoji loader complete: ${uploaded.length} uploaded.`
+    );
+};
+
+module.exports = {
+    EMOJI,
+    loadEmojis
+};

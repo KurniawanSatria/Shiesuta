@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" translate="no">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <script>
+        try {
+            const t = localStorage.getItem('theme');
+            if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+            else if (matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.dataset.theme = 'dark';
+        } catch { }
+    </script>
+
+    <title>Terms of Service — Shiesuta</title>
+    <meta name="description" content="Terms of Service for Shiesuta Discord music bot." />
+    <meta property="og:title" content="Terms of Service — Shiesuta" />
+    <meta property="og:description" content="Terms of Service for Shiesuta Discord music bot." />
+    <meta property="og:type" content="website" />
+
+    <link rel="icon" href="favicon.png" type="image/png" sizes="any" />
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5/daisyui.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="theme.css" />
+</head>
+
+<body class="bg-base-100 text-base-content min-h-screen flex flex-col">
+
+    <header class="navbar sticky top-0 z-50 bg-base-100/80 backdrop-blur-lg border-b border-base-300">
+        <div class="navbar-start">
+            <a href="index.html" class="btn btn-ghost text-xl font-bold gap-2 px-2">
+                <img src="favicon.png" alt="" class="w-7 h-7 rounded-lg" />
+                <span class="text-gradient">Shiesuta</span>
+            </a>
+        </div>
+        <div class="navbar-end gap-2">
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle" aria-label="Change theme">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3a9 9 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                    </svg>
+                </div>
+                <ul tabindex="0"
+                    class="dropdown-content bg-base-200 rounded-box z-50 w-40 p-2 shadow-xl flex flex-col gap-1">
+                    <li>
+                        <label class="label cursor-pointer justify-start gap-3 rounded-lg px-3 py-2">
+                            <input type="radio" name="theme-dropdown" value="light"
+                                class="theme-controller radio radio-primary radio-xs" aria-label="Light theme" />
+                            <span class="label-text">☀️ Light</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="label cursor-pointer justify-start gap-3 rounded-lg px-3 py-2">
+                            <input type="radio" name="theme-dropdown" value="dark"
+                                class="theme-controller radio radio-primary radio-xs" aria-label="Dark theme" />
+                            <span class="label-text">🌙 Dark</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+            <a href="index.html" class="btn btn-ghost btn-sm">← Back to Home</a>
+        </div>
+    </header>
+
+    <main class="flex-1">
+        <div class="container mx-auto px-4 py-12 max-w-3xl legal">
+            <div class="badge badge-primary badge-soft mb-3">Legal</div>
+            <h1 class="text-4xl font-bold mb-2">Terms of Service</h1>
+            <p class="opacity-60 text-sm mb-8">Last updated: September 16, 2026</p>
+
+            <h2>1. Acceptance of Terms</h2>
+            <p>By accessing or using Shiesuta (the "Bot"), you agree to be bound by these Terms of Service ("Terms"). If
+                you
+                do not agree with all the terms and conditions, you are prohibited from using the Bot. These Terms apply
+                to all
+                users of the Bot.</p>
+
+            <h2>2. Eligibility</h2>
+            <p>You must be at least 13 years old to use the Bot. If you are under 18, you represent and warrant that you
+                have
+                the permission of a parent or guardian to use the Bot. By using the Bot, you represent and warrant that
+                you
+                have the legal capacity and ability to enter into these Terms.</p>
+
+            <h2>3. License</h2>
+            <p>The Bot is licensed under the MIT License. You may use, copy, modify, and distribute the Bot in
+                accordance
+                with the license terms. The license does not grant you ownership of the Bot or any intellectual property
+                rights
+                therein.</p>
+
+            <h2>4. User Responsibilities</h2>
+            <p>You are responsible for maintaining the confidentiality of your Discord account and for all activities
+                that
+                occur under your account. You agree to:</p>
+            <ul>
+                <li>Comply with all applicable laws and regulations.</li>
+                <li>Respect the rights of others and not use the Bot to harass, abuse, or spam other users.</li>
+                <li>Not use the Bot to play or share content that is illegal, harmful, or violates the rights of others.
+                </li>
+                <li>Not attempt to bypass, interfere with, or disrupt the operation of the Bot.</li>
+                <li>Not reverse engineer, decompile, or disassemble the Bot.</li>
+                <li>Report any misuse of the Bot promptly to the administrators.</li>
+            </ul>
+
+            <h2>5. Prohibited Content</h2>
+            <p>You agree not to use the Bot to play, share, or distribute any content that is:</p>
+            <ul>
+                <li>Illegal, harmful, or fraudulent.</li>
+                <li>Infringing, defamatory, or obscene.</li>
+                <li>Harassing, threatening, or violent.</li>
+                <li>In violation of any third-party rights.</li>
+                <li>Spam, deceptive, or otherwise objectionable.</li>
+            </ul>
+            <p>The administrators reserve the right to remove or ban content or users that violate these provisions.</p>
+
+            <h2>6. Third-Party Services</h2>
+            <p>The Bot integrates with third-party services such as YouTube, Spotify, and SoundCloud. Your use of these
+                services is governed by their respective terms and policies. The Bot is not responsible for the
+                availability,
+                accuracy, or legality of any content provided by third-party services.</p>
+
+            <h2>7. Limitation of Liability</h2>
+            <p>To the maximum extent permitted by law, in no event shall the Bot's operators be liable for any indirect,
+                incidental, special, consequential, or punitive damages, or any loss of data, profits, or use, arising
+                out of
+                or in connection with the use of the Bot, whether based on warranty, contract, tort, or any other legal
+                theory.</p>
+
+            <h2>8. Indemnification</h2>
+            <p>You agree to indemnify and hold harmless the Bot's operators, their affiliates, and their respective
+                officers,
+                directors, employees, and agents from and against any claims, liabilities, damages, losses, or expenses
+                arising
+                out of or in any way connected with your access to or use of the Bot.</p>
+
+            <h2>9. Termination</h2>
+            <p>We reserve the right, at our sole discretion, to modify or discontinue the Bot, or any part of it, at any
+                time
+                without notice. We may also block or terminate your access to the Bot at any time, without liability, if
+                in our
+                opinion you have breached these Terms.</p>
+
+            <h2>10. Governing Law</h2>
+            <p>These Terms shall be governed by and construed in accordance with the laws of Indonesia, without regard
+                to its
+                conflict of law principles. Any legal action or proceeding arising under these Terms will be subject to
+                the
+                exclusive jurisdiction of the courts located in Indonesia.</p>
+
+            <h2>11. Changes to Terms</h2>
+            <p>We may revise these Terms from time to time. If we do, we will update the "Last updated" date at the top
+                of
+                this page. By continuing to use the Bot after those changes, you agree to the revised Terms. Your
+                responsibility is to check these Terms periodically for changes.</p>
+
+            <h2>12. Contact Information</h2>
+            <p>If you have any questions about these Terms, please contact the bot owner via the project's GitHub
+                repository
+                at <a
+                    href="https://github.com/KurniawanSatria/Shiesuta">https://github.com/KurniawanSatria/Shiesuta</a>.
+            </p>
+
+            <div class="divider mt-10"></div>
+            <p class="text-center text-sm opacity-60">© 2026 Shiesuta. All rights reserved.</p>
+        </div>
+    </main>
+
+    <footer class="footer sm:footer-horizontal bg-base-200 text-base-content border-t border-base-300 p-10">
+        <aside class="max-w-xs">
+            <div class="flex items-center gap-2 mb-2">
+                <img src="favicon.png" alt="" class="w-8 h-8 rounded-lg" />
+                <span class="text-xl font-bold text-gradient">Shiesuta</span>
+            </div>
+            <p class="text-sm opacity-70">A modern Discord music bot.<br />Powered by Kazagumo &amp; Lavalink.</p>
+        </aside>
+        <nav>
+            <h6 class="footer-title">Product</h6>
+            <a class="link link-hover" href="index.html#features">Features</a>
+            <a class="link link-hover" href="index.html#commands">Commands</a>
+            <a class="link link-hover" href="index.html#setup">Setup</a>
+            <a class="link link-hover" href="https://github.com/KurniawanSatria/Shiesuta" target="_blank"
+                rel="noopener">GitHub</a>
+        </nav>
+        <nav>
+            <h6 class="footer-title">Legal</h6>
+            <a class="link link-hover" href="terms.html">Terms of Service</a>
+            <a class="link link-hover" href="privacy.html">Privacy Policy</a>
+        </nav>
+        <nav id="support">
+            <h6 class="footer-title">Support the project</h6>
+            <a class="link link-hover" href="https://trakteer.id/saturiaaa" target="_blank" rel="noopener">🫶
+                Trakteer</a>
+            <a class="link link-hover" href="https://saweria.co/Saturiaaa" target="_blank" rel="noopener">☕ Saweria</a>
+            <a class="link link-hover" href="https://sociabuzz.com/saturiaaa" target="_blank" rel="noopener">💬
+                Sociabuzz</a>
+        </nav>
+    </footer>
+
+    <footer class="footer bg-base-200 border-t border-base-300 py-4 px-10">
+        <p class="text-sm opacity-60 w-full text-center">
+            © 2026 Shiesuta. Made with ❤️ for the Discord community. Licensed under MIT.
+        </p>
+    </footer>
+
+    <script src="site.js"></script>
+</body>
+
+</html>

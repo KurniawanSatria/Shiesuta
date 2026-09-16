@@ -1,0 +1,49 @@
+# Secrets / environment
+.env
+.env.*
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Logs & temp
+*.log
+logs/
+tmp/
+temp/
+
+# Databases / local data
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+#config
+config.json
+
+# agent
+.agents/*
