@@ -1,4 +1,4 @@
-<p align="center">
+﻿<p align="center">
 <img width="2048" height="877" alt="Shiesuta" src="https://github.com/user-attachments/assets/b57d67da-9dc7-46a9-84a8-87008f567691"/>
 </p>
 
@@ -7,8 +7,7 @@
 <p align="center">
 A modern Discord music bot powered by
 <strong>Discord.js</strong>,
-<strong>Kazagumo</strong>,
-<strong>Shoukaku</strong>, and
+<strong>lavalink-client</strong>, and
 <strong>Lavalink</strong>.
 </p>
 
@@ -33,7 +32,7 @@ ___
 -   ⏭️ Skip tracks
 -   ⏹️ Stop and destroy the player
 -   🎧 Discord voice channel support
--   🎶 Spotify integration through `kazagumo-spotify`
+-   🎶 Spotify integration via the [LavaSrc plugin](https://github.com/topi314/LavaSrc) on your Lavalink node
 -   ⚡ Powered by Bun or Node.js
 -   🖥️ Designed for VPS / game-panel hosting environments
 
@@ -69,6 +68,7 @@ Create `config.json`:
 	"token": "YOUR_BOT_TOKEN", // get it from https://discord.com/developers/applications/YOUR_APPLICATION/bot
 	"prefix": ".",
 	"defaultLang": "en",
+	"searchPlatform": "ytmsearch",
 	"nodes": [
 		{
 			"name": "main",
@@ -77,11 +77,6 @@ Create `config.json`:
 			"secure": false
 		}
 	],
-	"spotify": {
-		"clientId": "YOUR_SPOTIFY_CLIENT_ID",  // get it from 
-		"clientSecret": "YOUR_SPOTIFY_CLIENT_SECRET",  // get it from https://developer.spotify.com/dashboard/YOUR_APPLICATION
-		"searchMarket": "ID"
-	},
 	"donate": {
 		"url": "https://saweria.co/Saturiaaa",
 		"chance": 0.1
@@ -119,7 +114,7 @@ ___
 
 ## Lavalink
 
-This bot uses Lavalink as the audio server.
+This bot uses Lavalink as the audio server. For Spotify / Deezer / Apple Music support, install the [LavaSrc plugin](https://github.com/topi314/LavaSrc) on your Lavalink node.
 
 Example node configuration:
 

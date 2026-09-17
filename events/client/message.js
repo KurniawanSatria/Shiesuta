@@ -11,6 +11,7 @@ const ALIASES = {
     r: "resume", resume: "resume",
     st: "stop", stop: "stop", leave: "stop", dc: "stop",
     lp: "loop", loop: "loop", repeat: "loop",
+    ap: "autoplay", autoplay: "autoplay", auto: "autoplay",
     set: "set", lang: "set",
     h: "help", help: "help"
 };
@@ -27,7 +28,7 @@ module.exports = {
         const command = ctx.commands.get(cmd);
         if (!command) return;
         clearIdle(m.guild.id);
-        const player = ctx.kazagumo.players.get(m.guild.id);
+        const player = ctx.lavalink.getPlayer(m.guild.id);
         const t = T(m.guild.id);
         await command.run(m, args, { ...ctx, player, t }).catch(e => global.log.error(`Command ${cmd}:`, e));
         if (cfg.cleanMode) setTimeout(() => m.delete().catch(() => { }), 5000);

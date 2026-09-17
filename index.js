@@ -3,10 +3,9 @@ process.on("uncaughtException", (e) => global.log.error(`Uncaught: ${e?.message 
 const fs = require("fs");
 const path = require("path");
 const { Client, GatewayIntentBits, Events } = require("discord.js");
-const { Connectors } = require("shoukaku");
-const { Kazagumo } = require("kazagumo");
-const Spotify = require("kazagumo-spotify");
+const { LavalinkManager } = require("lavalink-client");
 const { loadEmojis } = require("./lib/emoji");
+const { autoPlayFunction } = require("./lib/autoplay");
 const state = require("./lib/state");
 const cfg = require("./config.json");
 const chalk = require('chalk');
@@ -18,17 +17,17 @@ console.clear();
 
 const getTime = () => chalk.bgWhite.black.italic(` ${moment().tz("Asia/Jakarta").format("HH:mm:ss")} `);
 const format = (label, color, msg) => `${getTime()} ${color.bold(`[${label}]`)} ${chalk.gray(msg)}`;
+const fmtArgs = (args) => args.map(a => a instanceof Error ? (a.stack ?? a.message) : typeof a === "object" && a !== null ? JSON.stringify(a) : String(a)).join(" ");
 global.log = {
-    info: (msg) => console.log(format("INFO", chalk.blueBright, msg)),
-    warn: (msg) => console.log(format("WARN", chalk.yellowBright, msg)),
-    error: (msg) => console.log(format("ERROR", chalk.redBright, msg)),
-    debug: (msg) => console.log(format("DEBUG", chalk.greenBright, msg)),
+    info: (...msg) => console.log(format("INFO", chalk.blueBright, fmtArgs(msg))),
+    warn: (...msg) => console.log(format("WARN", chalk.yellowBright, fmtArgs(msg))),
+    error: (...msg) => console.log(format("ERROR", chalk.redBright, fmtArgs(msg))),
+    debug: (...msg) => console.log(format("DEBUG", chalk.greenBright, fmtArgs(msg))),
 };
 
 
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
-client.activePlayers = new Map();
 
 const cleanMessages = async () => {
     if (!cfg.cleanMode || !client.isReady()) return;
@@ -48,17 +47,44 @@ const cleanMessages = async () => {
 setInterval(() => cleanMessages().catch(error => global.log.error(`Clean mode error: ${error.message}`)), 10000);
 
 
-const Nodes = cfg.nodes
-const kazagumo = new Kazagumo({
-    plugins: [
-        new Spotify({ clientId: cfg.spotify?.clientId ?? "", clientSecret: cfg.spotify?.clientSecret ?? "", playlistPageLimit: 2, albumPageLimit: 1, artistPageLimit: 1, searchLimit: 10, searchMarket: cfg.spotify?.searchMarket ?? "ID" })
-    ],
-    defaultSearchEngine: "youtube",
-    send: (guildId, payload) => {
+const Nodes = (cfg.nodes ?? []).map(n => {
+    const [host, port] = String(n.url ?? `${n.host}:${n.port ?? 2333}`).split(":");
+    return {
+        id: n.id ?? n.name ?? "main",
+        host,
+        port: Number(port || 2333),
+        authorization: n.authorization ?? n.auth ?? "youshallnotpass",
+        secure: n.secure ?? false
+    };
+});
+
+const lavalink = new LavalinkManager({
+    nodes: Nodes,
+    sendToShard: (guildId, payload) => {
         const guild = client.guilds.cache.get(guildId);
         if (guild) guild.shard.send(payload);
+    },
+    autoSkip: true,
+    client: {
+        id: client.user?.id ?? "unknown",
+        username: "Shiesuta"
+    },
+    playerOptions: {
+        defaultSearchPlatform: cfg.searchPlatform ?? "ytmsearch",
+        onDisconnect: {
+            autoReconnect: true,
+            destroyPlayer: false
+        },
+        onEmptyQueue: {
+            autoPlayFunction: autoPlayFunction
+        }
+    },
+    queueOptions: {
+        maxPreviousTracks: 25
     }
-}, new Connectors.DiscordJS(client), Nodes, { reconnectTries: 10, reconnectInterval: 5000, restTimeout: 60000, resumable: true, resumableTimeout: 60000 });
+});
+
+client.on("raw", (packet) => lavalink.sendRawData(packet));
 
 
 
@@ -71,7 +97,7 @@ for (const f of fs.readdirSync(cmdDir).filter(f => f.endsWith(".js"))) {
 
 
 
-const ctx = { client, kazagumo, commands };
+const ctx = { client, lavalink, commands };
 const loadEvents = (dir, emitter, argBuilder) => {
     for (const f of fs.readdirSync(dir).filter(f => f.endsWith(".js"))) {
         const e = require(path.join(dir, f));
@@ -82,25 +108,23 @@ const loadEvents = (dir, emitter, argBuilder) => {
 
 
 
-kazagumo.client = client;
-
-
-
 const evDir = path.join(__dirname, "events/");
 loadEvents(path.join(evDir, "client"), client, function client(args) { return args; });
-loadEvents(path.join(evDir, "kazagumo"), kazagumo, function kazagumo(args) { return args; });
+loadEvents(path.join(evDir, "lavalink"), lavalink, function lavalink(args) { return args; });
 
 
 
-kazagumo.shoukaku.on('close', (name, code, reason) => global.log.warn(`Lavalink ${name}: Closed, Code ${code}, Reason ${reason || 'No reason'}`));
-kazagumo.shoukaku.on('debug', (name, info) => global.log.debug(`Lavalink ${name}: Debug, ${info}`));
-kazagumo.shoukaku.on("error", (name, error) => global.log.error(`Lavalink ${name}: ${error}`));
-kazagumo.shoukaku.on('ready', (name) => global.log.info(`Lavalink ${name}: Ready!`));
+lavalink.nodeManager
+    .on("connect", (node) => global.log.info(`Lavalink ${node.id}: Ready!`))
+    .on("disconnect", (node, reason) => global.log.warn(`Lavalink ${node.id}: Disconnected, Reason: ${typeof reason === "object" ? JSON.stringify(reason) : reason ?? "No reason"}`))
+    .on("reconnecting", (node) => global.log.warn(`Lavalink ${node.id}: Reconnecting...`))
+    .on("error", (node, error) => global.log.error(`Lavalink ${node.id}: ${error?.message ?? error?.error?.message ?? JSON.stringify(error)}`));
 
 
 
 
 client.once(Events.ClientReady, async c => {
+    lavalink.init({ id: c.user.id, username: c.user.username });
     await loadEmojis(c);
     await cleanMessages();
     global.log.info(`Ready! Logged in as ${c.user.tag}`);

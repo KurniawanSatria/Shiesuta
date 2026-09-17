@@ -1,14 +1,14 @@
 {
   "name": "Shiesuta",
   "version": "1.0.0",
-  "description": "A Discord music bot powered by Kazagumo and Lavalink.",
+  "description": "A Discord music bot powered by lavalink-client and Lavalink.",
   "keywords": [
     "discord",
     "discord-bot",
     "music",
     "lavalink",
-    "kazagumo",
-    "spotify"
+    "lavalink-client",
+    "lavalink-v4"
   ],
   "homepage": "https://github.com/KurniawanSatria/Shiesuta",
   "repository": {
@@ -34,10 +34,8 @@
     "@discordjs/voice": "^0.19.2",
     "chalk": "4.1.2",
     "discord.js": "^14.27.0",
-    "kazagumo": "^3.4.3",
-    "kazagumo-spotify": "^2.1.1",
+    "lavalink-client": "^2.11.0",
     "logging": "^4.2.0",
-    "moment-timezone": "^0.6.4",
-    "shoukaku": "^4.1.0"
+    "moment-timezone": "^0.6.4"
   }
 }

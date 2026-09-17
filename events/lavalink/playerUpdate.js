@@ -1,0 +1,18 @@
+const state = require("../../lib/state");
+const { nowPlayingCard } = require("../../lib/ui");
+
+module.exports = {
+    name: "playerUpdate",
+    emitter: "lavalink",
+    async run(ctx, player) {
+        const guildId = player.guildId;
+        const position = player.position / 1000;
+        const st = state.npState.get(guildId);
+        if (!st || player.paused) return;
+        if (!st.lines?.length) return;
+        const i = st.lines.findLastIndex(line => line.time <= position);
+        if (i === -1 || i === st.last) return;
+        st.last = i;
+        st.msg.edit(nowPlayingCard(guildId, { info: st.track }, st.requester, st.lines, position)).catch(() => { });
+    }
+};

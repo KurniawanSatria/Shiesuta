@@ -4,23 +4,22 @@ const { purge, clearIdle, fetchLyrics, parseLrc } = require("../../lib/utils");
 const state = require("../../lib/state");
 
 module.exports = {
-    name: "playerStart",
-    emitter: "kazagumo",
+    name: "trackStart",
+    emitter: "lavalink",
     async run(ctx, player, track) {
-        ctx.client.activePlayers.set(player.guildId, player);
-        global.log.debug(`[${player.guildId}] playing ${track.title}`);
+        global.log.debug(`[${player.guildId}] playing ${track.info.title}`);
         clearIdle(player.guildId);
         await purge(player.guildId);
-        const channel = player.textId ? ctx.client.channels.cache.get(player.textId) : null;
+        const channel = player.textChannelId ? ctx.client.channels.cache.get(player.textChannelId) : null;
         if (!channel) return;
         const t = T(player.guildId);
         const requester = track.requester?.toString() ?? t.unknown;
-        const lyrics = await fetchLyrics(track);
+        const info = track.info;
+        const lyrics = await fetchLyrics({ info });
         const lines = lyrics?.syncedLyrics ? parseLrc(lyrics.syncedLyrics) : [];
-        const msg = await channel.send(nowPlayingCard(player.guildId, track, requester, lines, 0)).catch(() => null);
+        const msg = await channel.send(nowPlayingCard(player.guildId, { info }, requester, lines, 0)).catch(() => null);
         if (!msg) return;
         state.pending.set(player.guildId, [msg]);
-        state.npState.set(player.guildId, { msg, track, requester, lines, last: 0 });
-        state.posState.set(player.guildId, { pos: 0, at: Date.now(), paused: false });
+        state.npState.set(player.guildId, { msg, track: info, requester, lines, last: 0 });
     }
 };

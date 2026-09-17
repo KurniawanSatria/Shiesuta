@@ -3,6 +3,7 @@
 	"prefix": ".",
 	"defaultLang": "en",
 	"cleanMode": false,
+	"searchPlatform": "ytmsearch",
 	"nodes": [
 		{
 			"name": "main",
@@ -11,11 +12,6 @@
 			"secure": false
 		}
 	],
-	"spotify": {
-		"clientId": "YOUR_SPOTIFY_CLIENT_ID",
-		"clientSecret": "YOUR_SPOTIFY_CLIENT_SECRET",
-		"searchMarket": "ID"
-	},
 	"donate": {
 		"url": "https://saweria.co/Saturiaaa",
 		"chance": 0.1

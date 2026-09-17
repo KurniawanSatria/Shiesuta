@@ -50,3 +50,7 @@ config.json
 
 ## Bun
 bun.lock
+
+.omo/*
+.codegraph/*
+.emoji-hunt/*
