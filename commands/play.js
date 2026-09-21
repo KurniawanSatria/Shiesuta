@@ -36,17 +36,38 @@ module.exports = {
             // configured default search platform (ytmsearch unless configured).
             const defaultPlatform = cfg.searchPlatform ?? cfg.searchPlatfor ?? lavalink.options.playerOptions?.defaultSearchPlatform ?? "ytmsearch";
             const searchQuery = URL_RE.test(query) ? { query } : { query, source: defaultPlatform };
-            const result = await p.search(searchQuery, m.author).catch(() => null);
+            let result = await p.search(searchQuery, m.author).catch(() => null);
+            if (!result || result.loadType === "error" || result.loadType === "empty" || !result.tracks?.length) {
+                const oldNode = p.node?.id;
+                try {
+                    const newNode = await p.moveNode();
+                    global.log.warn(`Play search failed on ${m.guild.id}: moved player from ${oldNode} to ${newNode}`);
+                    result = await p.search(searchQuery, m.author).catch(() => null);
+                } catch (error) {
+                    global.log.warn(`Play search failover on ${m.guild.id} failed: ${error?.message ?? error}`);
+                }
+            }
             if (!result || result.loadType === "error" || result.loadType === "empty" || !result.tracks?.length) return m.reply(reply(`### ${EMOJI.error} Error`, `${t.noResults}`));
             // Skip broken tracks (no/short duration) per lavalink-client tipps docs.
-            const valid = result.tracks.filter(tr => lavalink.utils.isNotBrokenTrack(tr));
+            let valid = result.tracks.filter(tr => lavalink.utils.isNotBrokenTrack(tr));
+            if (!valid.length) {
+                const oldNode = p.node?.id;
+                try {
+                    const newNode = await p.moveNode();
+                    global.log.warn(`Play search returned broken tracks on ${m.guild.id}: moved player from ${oldNode} to ${newNode}`);
+                    result = await p.search(searchQuery, m.author).catch(() => null);
+                    valid = result?.tracks?.filter(tr => lavalink.utils.isNotBrokenTrack(tr)) ?? [];
+                } catch (error) {
+                    global.log.warn(`Play broken-track failover on ${m.guild.id} failed: ${error?.message ?? error}`);
+                }
+            }
             if (!valid.length) return m.reply(reply(`### ${EMOJI.error} Error`, `${t.noResults}`));
             const isPlaylist = result.loadType === "playlist";
             const track = valid[0];
             if (isPlaylist) await p.queue.add(valid);
             else await p.queue.add(track);
             const info = track.info;
-            const msg = await m.reply(card({ title: `### ${EMOJI.queueadd} ${isPlaylist ? t.playlistQueued : t.queued}`, body: isPlaylist ? `**${result.playlist?.title}**\n-# ${EMOJI.queueadd} ${valid.length} ${t.tracks}  •  ${EMOJI.user} ${m.author.toString()}` : trackBody(track, m.author.toString(), t), thumb: info.artworkUrl }));
+            const msg = await m.reply(card({ title: `### ${isPlaylist ? EMOJI.playlist : EMOJI.queue_add} ${isPlaylist ? t.playlistQueued : t.queued}`, body: isPlaylist ? `**${result.playlist?.title}**\n-# ${EMOJI.queue_add} ${valid.length} ${t.tracks}  •  ${EMOJI.user} ${m.author.toString()}` : trackBody(track, m.author.toString(), t), thumb: info.artworkUrl }));
             const list = state.pending.get(m.guild.id) ?? [];
             list.push(msg);
             state.pending.set(m.guild.id, list);

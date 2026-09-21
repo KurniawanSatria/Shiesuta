@@ -22,6 +22,6 @@ module.exports = {
         const channel = player.textChannelId ? ctx.client.channels.cache.get(player.textChannelId) : null;
         if (!channel) return;
         const t = T(player.guildId);
-        await channel.send(reply(`### ${EMOJI.bye} ${t.voiceClosed || "Disconnected from voice, queue cleared."}`, "")).catch(() => { });
+        await channel.send(reply(`### ${EMOJI.so_so} ${t.voiceClosed || "Disconnected from voice, queue cleared."}`, "")).catch(() => { });
     }
 };

@@ -8,9 +8,9 @@ module.exports = {
     async run(m, args, { player, t }) {
         if (!player) return m.reply(reply(`### ${EMOJI.error} Error`, `${t.noPlayer}`));
         const MODES = {
-            track: ["track", "loopTrackSub", EMOJI.loop1],
-            queue: ["queue", "loopQueueSub", EMOJI.loop],
-            off: ["off", "loopOffSub", EMOJI.check]
+            track: ["track", "loopTrackSub", EMOJI.repeat],
+            queue: ["queue", "loopQueueSub", EMOJI.repeat],
+            off: ["off", "loopOffSub", EMOJI.success]
         };
         const arg = args[0]?.toLowerCase();
         const key = MODES[arg] ? arg : CYCLE[player.repeatMode ?? "off"];

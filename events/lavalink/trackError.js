@@ -7,9 +7,19 @@ module.exports = {
     emitter: "lavalink",
     once: false,
     async run(ctx, player, track, payload) {
-        // Skipping itself is automatic (autoSkip: true + maxErrorsPerTime destroys
-        // the player after repeated failures); tell the user why.
         global.log.error(`Track error on ${player.guildId} ${player.guild?.name ?? ""}: ${track?.info?.title ?? "unknown"} — ${payload?.exception?.message ?? payload?.message ?? "unknown"}`);
+        const trackKey = track?.info?.identifier ?? track?.info?.uri ?? track?.info?.title;
+        if (trackKey && player.getData("trackErrorFailover") !== trackKey) {
+            player.setData("trackErrorFailover", trackKey);
+            try {
+                const oldNode = player.node?.id;
+                const newNode = await player.moveNode();
+                global.log.warn(`Track error on ${player.guildId}: moved player from ${oldNode} to ${newNode}`);
+                return;
+            } catch (error) {
+                global.log.warn(`Track error failover on ${player.guildId} failed: ${error?.message ?? error}`);
+            }
+        }
         const channel = player.textChannelId ? ctx.client.channels.cache.get(player.textChannelId) : null;
         if (!channel) return;
         const t = T(player.guildId);

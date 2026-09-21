@@ -15,11 +15,12 @@ module.exports = {
         const t = T(player.guildId);
         const requester = track.requester?.toString() ?? t.unknown;
         const info = track.info;
+        player.setData("trackErrorFailover", undefined);
         const lyrics = await fetchLyrics({ info });
         const lines = lyrics?.syncedLyrics ? parseLrc(lyrics.syncedLyrics) : [];
-        const msg = await channel.send(nowPlayingCard(player.guildId, { info }, requester, lines, 0)).catch((e) => global.log.error(`Failed to send now playing message on ${player.guildId} ${player.guild?.name ?? ""}: ${e.message}`));
+        const msg = await channel.send(nowPlayingCard(player.guildId, player, { info }, requester, lines, 0)).catch((e) => global.log.error(`Failed to send now playing message on ${player.guildId} ${player.guild?.name ?? ""}: ${e.message}`));
         if (!msg) return;
         state.pending.set(player.guildId, [msg]);
-        state.npState.set(player.guildId, { msg, track: info, requester, lines, last: -1, lastEdit: Date.now() });
+        state.npState.set(player.guildId, { msg, track: info, requester, lines, lyricsVisible: false, last: -1, lastEdit: Date.now() });
     }
 };

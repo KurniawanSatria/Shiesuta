@@ -12,6 +12,6 @@ module.exports = {
         if (!channel) return;
         const title = t.queueEndedTitle ?? "Queue Ended";
         const body = t.queueEnded ?? "-# Queue ended.";
-        await channel.send(reply(`### ${EMOJI.cd ?? EMOJI.music} ${title}`, `${body}`)).catch(() => { });
+        await channel.send(reply(`### ${EMOJI.cd ?? EMOJI.audio_wave} ${title}`, `${body}`)).catch(() => { });
     }
 };

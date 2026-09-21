@@ -14,7 +14,7 @@ const SUBCOMMANDS = {
         const val = args[0];
         if (!val || val.length > 5) return m.reply(reply(`### ${EMOJI.error} Error`, t.setPrefixBad));
         await db.set(m.guild.id, { prefix: val });
-        return m.reply(reply(`### ${EMOJI.check} Prefix`, t.setPrefixOk.replace("{prefix}", val)));
+        return m.reply(reply(`### ${EMOJI.success} Prefix`, t.setPrefixOk.replace("{prefix}", val)));
     },
     async autoplay(m, args, t, player) {
         const settings = await db.get(m.guild.id);
@@ -30,7 +30,7 @@ const SUBCOMMANDS = {
         if (isNaN(val) || val < 0 || val > 100) return m.reply(reply(`### ${EMOJI.error} Error`, t.volBad));
         if (player) await player.setVolume(val);
         await db.set(m.guild.id, { volume: val });
-        return m.reply(reply(`### ${EMOJI.check} Volume`, t.volSet.replace("{vol}", val)));
+        return m.reply(reply(`### ${EMOJI.success} Volume`, t.volSet.replace("{vol}", val)));
     }
 };
 

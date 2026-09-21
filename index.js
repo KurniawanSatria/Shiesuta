@@ -2,7 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const { Client, GatewayIntentBits, Events, Message, MessagePayload } = require("discord.js");
 const { LavalinkManager, Player } = require("lavalink-client");
-const { loadEmojis } = require("./lib/emoji");
 const { autoPlayFunction } = require("./lib/autoplay");
 const state = require("./lib/state");
 const cfg = require("./config.json");

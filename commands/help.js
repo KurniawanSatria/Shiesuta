@@ -9,7 +9,7 @@ module.exports = {
     async run(m, args, { client, t }) {
         return m.reply(card({
             title: [
-                `### ${EMOJI.bookmark} ${t.helpTitle}`,
+                `### ${EMOJI.book} ${t.helpTitle}`,
                 `-# Uptime: ${formatUptime(process.uptime())}`,
                 `-# Servers: ${client.guilds.cache.size.toLocaleString()}`,
                 `-# Users: ${client.guilds.cache.reduce((total, guild) => total + guild.memberCount, 0).toLocaleString()}`
