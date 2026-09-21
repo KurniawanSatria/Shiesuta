@@ -31,9 +31,7 @@ A modern Discord music bot powered by
 
 <p align="center">
 <a href="https://open.spotify.com"><img src="https://img.badges.sh/badge?label=spotify&message=&color=ffc800&labelColor=1ED660&style=for-the-badge&logo=spotify&logoColor=212121&font=Poppins&labelFontWeight=700&messageFontWeight=700" alt="spotify: " /></a>
-&nbsp;&nbsp;
 <a href="https://www.youtube.com"><img src="https://img.badges.sh/badge?label=youtube&message=&color=ffc800&labelColor=FF0033&style=for-the-badge&labelTextColor=ffffff&logo=youtube&logoColor=ffffff&font=Poppins&labelFontWeight=700&messageFontWeight=700" alt="youtube: " /></a>
-&nbsp;&nbsp;
 <a href="https://soundcloud.com"><img src="https://img.badges.sh/badge?label=soundcloud&message=&color=ffc800&labelColor=FF4100&style=for-the-badge&labelTextColor=000000&logo=soundcloud&logoColor=000000&font=Poppins&labelFontWeight=700&messageFontWeight=700" alt="soundcloud: " /></a>
 
 ## Requirements
