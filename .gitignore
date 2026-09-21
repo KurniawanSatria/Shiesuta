@@ -58,3 +58,5 @@ config.json
 logs/
 tmp/
 temp/
+runner.sh
+start.js
