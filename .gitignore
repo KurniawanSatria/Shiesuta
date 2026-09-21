@@ -42,17 +42,19 @@ temp/
 .DS_Store
 Thumbs.db
 
-#config
+# Project secrets
 config.json
 
-# agent
-.agents/*
+# Local tooling
+.agents/
+.config/
+.bun/
+.local/
+.omo/
+.codegraph/
+.emoji-hunt/
 
-## Bun
-bun.lock
-
-.omo/*
-.codegraph/*
-.emoji-hunt/*
-logs
-.local
+# Runtime files
+logs/
+tmp/
+temp/
