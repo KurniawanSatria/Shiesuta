@@ -1,18 +1,24 @@
 const { reply } = require("../../lib/ui");
 const { EMOJI } = require("../../lib/emoji");
 const { T } = require("../../lib/i18n");
+const { restartBackupNode } = require("./nodeFailover");
 
 module.exports = {
     name: "trackError",
     emitter: "lavalink",
     once: false,
     async run(ctx, player, track, payload) {
-        global.log.error(`Track error on ${player.guildId} ${player.guild?.name ?? ""}: ${track?.info?.title ?? "unknown"} — ${payload?.exception?.message ?? payload?.message ?? "unknown"}`);
+        const errorMessage = payload?.exception?.message ?? payload?.message ?? "unknown";
+        global.log.error(`Track error on ${player.guildId} ${player.guild?.name ?? ""}: ${track?.info?.title ?? "unknown"} — ${errorMessage}`);
         const trackKey = track?.info?.identifier ?? track?.info?.uri ?? track?.info?.title;
         if (trackKey && player.getData("trackErrorFailover") !== trackKey) {
             player.setData("trackErrorFailover", trackKey);
             try {
                 const oldNode = player.node?.id;
+                if (/sign in to confirm|not a bot|tvhtml5_simply/i.test(errorMessage) && !player.getData("youtubeNodeRestart")) {
+                    player.setData("youtubeNodeRestart", true);
+                    await restartBackupNode(player.node);
+                }
                 const newNode = await player.moveNode();
                 global.log.warn(`Track error on ${player.guildId}: moved player from ${oldNode} to ${newNode}`);
                 return;

@@ -21,12 +21,24 @@ async function restartBackupNode(node) {
         const serverUuid = await findPanelServer(panel, node.id);
         if (!serverUuid) return global.log.warn(`Lavalink ${node.id} restart skipped: no matching panel server`) || false;
         const url = `${baseUrl}/api/client/servers/${serverUuid}/power`;
-        const res = await fetch(url, {
+        const stop = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${panel.token}` },
+            body: JSON.stringify({ action: "stop" })
+        });
+        if (!stop.ok) throw new Error(`stop returned ${stop.status}`);
+        const kill = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${panel.token}` },
+            body: JSON.stringify({ action: "kill" })
+        });
+        if (!kill.ok) throw new Error(`kill returned ${kill.status}`);
+        const start = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${panel.token}` },
             body: JSON.stringify({ action: "start" })
         });
-        if (!res.ok) throw new Error(`start returned ${res.status}`);
+        if (!start.ok) throw new Error(`start returned ${start.status}`);
         global.log.info(`Lavalink ${node.id} restart requested through panel`);
         return true;
     } catch (error) {
@@ -48,7 +60,7 @@ async function handleNodeFailover(ctx, node, reason) {
         for (const player of affectedPlayers) {
             const channel = player.textChannelId ? ctx.client.channels.cache.get(player.textChannelId) : null;
             const t = T(player.guildId);
-            if (channel) await channel.send(reply(`### ${EMOJI.error} ${t.nodeDown || "Music server unavailable, playback stopped."}`, "")).catch(() => {});
+            if (channel) await channel.send(reply(`### ${EMOJI.error} ${t.nodeDown || "Music server unavailable, playback stopped."}`, "")).catch(() => { });
         }
         return;
     }
@@ -67,7 +79,7 @@ async function handleNodeFailover(ctx, node, reason) {
 
             global.log.info(`Moving player ${guildId} from ${node.id} to ${targetNode.id} at ${position}ms`);
 
-            await player.destroy("Node failover").catch(() => {});
+            await player.destroy("Node failover").catch(() => { });
 
             const settings = await db.get(guildId);
             const newPlayer = await ctx.lavalink.createPlayer({
@@ -85,7 +97,7 @@ async function handleNodeFailover(ctx, node, reason) {
                 await newPlayer.queue.add(currentTrack);
                 if (wasPlaying) {
                     await newPlayer.play();
-                    await newPlayer.seek(position).catch(() => {});
+                    await newPlayer.seek(position).catch(() => { });
                 }
             }
 
@@ -98,13 +110,13 @@ async function handleNodeFailover(ctx, node, reason) {
             const channel = textChannelId ? ctx.client.channels.cache.get(textChannelId) : null;
             const t = T(guildId);
             if (channel && currentTrack) {
-                await channel.send(reply(`### ${EMOJI.skip} ${t.nodeSwitched || "Switched music server"}`, `Resumed **${currentTrack.info.title}** at ${Math.floor(position / 1000)}s`)).catch(() => {});
+                await channel.send(reply(`### ${EMOJI.skip} ${t.nodeSwitched || "Switched music server"}`, `Resumed **${currentTrack.info.title}** at ${Math.floor(position / 1000)}s`)).catch(() => { });
             }
         } catch (e) {
             global.log.error(`Failover failed for ${player.guildId}: ${e?.message ?? e}`);
             const channel = player.textChannelId ? ctx.client.channels.cache.get(player.textChannelId) : null;
             const t = T(player.guildId);
-            if (channel) await channel.send(reply(`### ${EMOJI.error} ${t.nodeFailoverFailed || "Failed to switch music server, playback stopped."}`, "")).catch(() => {});
+            if (channel) await channel.send(reply(`### ${EMOJI.error} ${t.nodeFailoverFailed || "Failed to switch music server, playback stopped."}`, "")).catch(() => { });
         }
     }
 }
