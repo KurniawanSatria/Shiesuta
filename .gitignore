@@ -59,4 +59,6 @@ logs/
 tmp/
 temp/
 runner.sh
+start.jsbun.lock
 start.js
+runner.sh
