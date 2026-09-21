@@ -15,12 +15,12 @@ module.exports = {
             player.setData("trackErrorFailover", trackKey);
             try {
                 const oldNode = player.node?.id;
-                if (/sign in to confirm|not a bot|tvhtml5_simply/i.test(errorMessage) && !player.getData("youtubeNodeRestart")) {
-                    player.setData("youtubeNodeRestart", true);
-                    await restartBackupNode(player.node);
-                }
                 const newNode = await player.moveNode();
                 global.log.warn(`Track error on ${player.guildId}: moved player from ${oldNode} to ${newNode}`);
+                if (!oldNode) return global.log.warn(`Lavalink restart skipped after move on ${player.guildId}: source node is unknown`);
+                global.log.warn(`Restarting Lavalink node ${oldNode} after player move on ${player.guildId}`);
+                const restarted = await restartBackupNode({ id: oldNode });
+                global.log.info(`Lavalink ${oldNode} restart ${restarted ? "completed" : "was not requested"} after player move on ${player.guildId}`);
                 return;
             } catch (error) {
                 global.log.warn(`Track error failover on ${player.guildId} failed: ${error?.message ?? error}`);
