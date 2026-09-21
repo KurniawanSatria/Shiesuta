@@ -53,8 +53,7 @@ const writeLog = (text) => {
 global.log = {
     info: (...msg) => writeLog(format("INFO", chalk.blueBright, fmtArgs(msg))),
     warn: (...msg) => writeLog(format("WARN", chalk.yellowBright, fmtArgs(msg))),
-    error: (...msg) => writeLog(format("ERROR", chalk.redBright, fmtArgs(msg))),
-    debug: (...msg) => writeLog(format("DEBUG", chalk.greenBright, fmtArgs(msg))),
+    error: (...msg) => writeLog(format("ERROR", chalk.redBright, fmtArgs(msg)))
 };
 
 process.on("unhandledRejection", (e) => global.log.error(`Unhandled: ${e?.message ?? e}`));
@@ -277,7 +276,7 @@ lavalink.nodeManager
     .on("resumed", (node, payload, players) => global.log.info(`Lavalink ${node.id}: session resumed (${players?.length ?? 0} players)`))
     .on("error", (node, error) => global.log.error(`Lavalink ${node.id}: ${error?.message ?? error?.error?.message ?? JSON.stringify(error)}`));
 
-lavalink.on("debug", (eventKey, eventData) => global.log.debug(`Lavalink debug [${eventKey}]:`, eventData));
+lavalink.on("debug", (eventKey, eventData) => global.log.info(`Lavalink debug [${eventKey}]:`, eventData));
 
 
 
