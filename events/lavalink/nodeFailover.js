@@ -2,8 +2,41 @@ const { T } = require("../../lib/i18n");
 const { reply } = require("../../lib/ui");
 const { EMOJI } = require("../../lib/emoji");
 const db = require("../../lib/db");
+const cfg = require("../../config.json");
+
+async function findPanelServer(panel, nodeId) {
+    const baseUrl = String(panel.url ?? "https://panel.saturia.codes").replace(/\/+$/, "").replace(/\/api$/, "");
+    const res = await fetch(`${baseUrl}/api/client`, { headers: { Authorization: `Bearer ${panel.token}` } });
+    if (!res.ok) throw new Error(`server list returned ${res.status}`);
+    const servers = (await res.json()).data ?? [];
+    const server = servers.find(({ attributes }) => attributes?.name === nodeId);
+    return server?.attributes?.identifier ?? server?.attributes?.uuid ?? null;
+}
+
+async function restartBackupNode(node) {
+    const panel = cfg.panel;
+    if (!panel?.token) return global.log.warn(`Lavalink ${node.id} restart skipped: panel token is not configured`) || false;
+    const baseUrl = String(panel.url ?? "https://panel.saturia.codes").replace(/\/+$/, "").replace(/\/api$/, "");
+    try {
+        const serverUuid = await findPanelServer(panel, node.id);
+        if (!serverUuid) return global.log.warn(`Lavalink ${node.id} restart skipped: no matching panel server`) || false;
+        const url = `${baseUrl}/api/client/servers/${serverUuid}/power`;
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${panel.token}` },
+            body: JSON.stringify({ action: "start" })
+        });
+        if (!res.ok) throw new Error(`start returned ${res.status}`);
+        global.log.info(`Lavalink ${node.id} restart requested through panel`);
+        return true;
+    } catch (error) {
+        global.log.error(`Lavalink ${node.id} panel restart failed: ${error?.message ?? error}`);
+        return false;
+    }
+}
 
 async function handleNodeFailover(ctx, node, reason) {
+    await restartBackupNode(node);
     const affectedPlayers = [...ctx.lavalink.players.values()].filter(p => p.node?.id === node.id);
     if (!affectedPlayers.length) return;
 
@@ -76,4 +109,4 @@ async function handleNodeFailover(ctx, node, reason) {
     }
 }
 
-module.exports = { handleNodeFailover };
+module.exports = { handleNodeFailover, restartBackupNode, findPanelServer };

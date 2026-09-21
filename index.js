@@ -17,10 +17,11 @@ Object.defineProperty(MessagePayload.prototype, "isMessage", {
 
 Message.prototype.reply = function (options) {
     if (!this.channel) return;
-    const data = options instanceof MessagePayload ? options : MessagePayload.create(this.channel, options, {
+    const payload = options instanceof MessagePayload ? options : { ...options, allowedMentions: { parse: [] } };
+    const data = payload instanceof MessagePayload ? payload : MessagePayload.create(this.channel, payload, {
         reply: {
             messageReference: this.id,
-            failIfNotExists: options?.failIfNotExists ?? this.client.options.failIfNotExists
+            failIfNotExists: payload?.failIfNotExists ?? this.client.options.failIfNotExists
         }
     });
     return this.channel.send(data);

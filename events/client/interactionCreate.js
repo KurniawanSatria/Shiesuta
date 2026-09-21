@@ -8,9 +8,9 @@ module.exports = {
     async run(ctx, interaction) {
         if (!interaction.isButton()) return;
         const st = state.npState.get(interaction.guildId);
-        if (!st || st.msg.id !== interaction.message.id) return interaction.reply({ content: "This track is no longer active.", ephemeral: true });
+        if (!st || st.msg.id !== interaction.message.id) return interaction.reply({ content: "This track is no longer active.", ephemeral: true, allowedMentions: { parse: [] } });
         const player = ctx.lavalink.getPlayer(interaction.guildId);
-        if (!player) return interaction.reply({ content: "This track is no longer active.", ephemeral: true });
+        if (!player) return interaction.reply({ content: "This track is no longer active.", ephemeral: true, allowedMentions: { parse: [] } });
         if (["np_skip", "np_previous", "np_stop", "np_pause"].includes(interaction.customId)) {
             await interaction.deferUpdate().catch(() => { });
             if (interaction.customId === "np_skip") return player.skip(0, false).catch(() => { });

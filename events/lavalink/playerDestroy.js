@@ -24,6 +24,7 @@ module.exports = {
         const thumb = new AttachmentBuilder(fs.readFileSync('assets/banner.png'), { type: "image/png", name: 'banner.png' });
         const msg = await channel.send({
             flags: 32768,
+            allowedMentions: { parse: [] },
             files: [thumb],
             components: [
                 {
