@@ -36,6 +36,7 @@
     "discord.js": "^14.27.0",
     "lavalink-client": "^2.11.0",
     "logging": "^4.2.0",
-    "moment-timezone": "^0.6.4"
+    "moment-timezone": "^0.6.4",
+    "mongoose": "^9.10.1"
   }
 }

@@ -3,6 +3,6 @@ module.exports = {
     emitter: "lavalink",
     once: false,
     async run(ctx, player, payload) {
-        global.log.debug(`[${player.guildId}] Player socket closed: ${payload?.code ?? "unknown"} — ${payload?.reason ?? "no reason"}`);
+        global.log.info(`Player socket closed on ${player.guildId} ${player.guild?.name ?? ""}: ${payload?.code ?? "unknown"} — ${payload?.reason ?? "no reason"}`);
     }
 };

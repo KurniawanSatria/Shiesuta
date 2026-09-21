@@ -1,8 +1,46 @@
+const fs = require("fs");
+const { AttachmentBuilder } = require("discord.js");
+const { EMOJI } = require("../../lib/emoji");
+const state = require("../../lib/state");
+
 module.exports = {
     name: "playerDestroy",
     emitter: "lavalink",
     once: false,
     async run(ctx, player, reason) {
-        global.log.debug(`[${player.guildId}] Player Destroyed${reason ? `: ${reason}` : ""}`);
+        global.log.info(`Player destroyed on ${player.guildId} ${player.guild?.name ?? ""}${reason ? `: ${reason}` : ""}`);
+        const channel = player.textChannelId ? ctx.client.channels.cache.get(player.textChannelId) : null;
+        if (!channel) return;
+        const thumb = new AttachmentBuilder(fs.readFileSync('assets/banner.png'), { type: "image/png", name: 'banner.png' });
+        const msg = await channel.send({
+            flags: 32768,
+            files: [thumb],
+            components: [
+                {
+                    type: 17,
+                    components: [
+                        {
+                            type: 12,
+                            items: [
+                                {
+                                    media: {
+                                        url: "attachment://banner.png"
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            type: 10,
+                            content: `### Thank you for using our service!\n\nLoving the bot?
+Consider supporting our work and the future development of the bot. Even a small donation helps a lot! ❤️\n\n**Support us:**
+- <:trakteer:1550260356729938000> **[Trakteer](https://trakteer.id/saturiaaa.)** 
+- <:saweria:1550260498686156810> **[Saweria](https://saweria.co/Saturiaaa)** 
+- <:sociabuzz:1550260354255163423> **[Sociabuzz](https://sociabuzz.com/saturiaaa/)**`
+                        }
+                    ]
+                }
+            ]
+        }).catch(() => null);
+        if (msg) state.destroyMessages.add(msg.id);
     }
 };

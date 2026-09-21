@@ -3,6 +3,6 @@ module.exports = {
     emitter: "lavalink",
     once: false,
     async run(ctx, player, voiceChannelId) {
-        global.log.debug(`[${player.guildId}] Player disconnected from voice channel ${voiceChannelId ?? "unknown"}`);
+        global.log.info(`Player disconnected on ${player.guildId} ${player.guild?.name ?? ""} from voice channel ${voiceChannelId ?? "unknown"}`);
     }
 };
