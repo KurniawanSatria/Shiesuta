@@ -1,5 +1,5 @@
 <p align="center">
-<img width="2048" height="877" alt="Shiesuta" src="https://raw.githubusercontent.com/KurniawanSatria/Shiesuta/refs/heads/main/assets/banner.png"/>
+<img alt="Shiesuta" src="https://raw.githubusercontent.com/KurniawanSatria/Shiesuta/refs/heads/main/assets/banner.png"/>
 </p>
 
 <h1 align="center">Shiesuta Music Bot</h1>
