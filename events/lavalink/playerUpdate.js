@@ -12,7 +12,10 @@ module.exports = {
         if (!st.lines?.length) return;
         const i = st.lines.findLastIndex(line => line.time <= position);
         if (i === -1 || i === st.last) return;
+        // // Throttle Discord edits: at most one per 5s to avoid rate limits.
+        // if (Date.now() - (st.lastEdit ?? 0) < 5000) return;
         st.last = i;
+        st.lastEdit = Date.now();
         st.msg.edit(nowPlayingCard(guildId, { info: st.track }, st.requester, st.lines, position)).catch(() => { });
     }
 };

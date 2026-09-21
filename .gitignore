@@ -54,4 +54,5 @@ bun.lock
 .omo/*
 .codegraph/*
 .emoji-hunt/*
-AGENTS.md
+logs
+.local

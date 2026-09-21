@@ -20,6 +20,6 @@ module.exports = {
         const msg = await channel.send(nowPlayingCard(player.guildId, { info }, requester, lines, 0)).catch((e) => global.log.error(`Failed to send now playing message on ${player.guildId} ${player.guild?.name ?? ""}: ${e.message}`));
         if (!msg) return;
         state.pending.set(player.guildId, [msg]);
-        state.npState.set(player.guildId, { msg, track: info, requester, lines, last: 0 });
+        state.npState.set(player.guildId, { msg, track: info, requester, lines, last: -1, lastEdit: Date.now() });
     }
 };

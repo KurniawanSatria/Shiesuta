@@ -55,5 +55,8 @@
     "volSet": "**Kelantangan ditetapkan kepada** `{vol}%`",
     "volBad": "**Cara guna:** `.volume <0-100>`",
     "donateTitle": "Suka dengan bot ini?",
-    "donateBody": "Bot ini percuma & dibuat dengan penuh kasih sayang. Sokong pembangun melalui derma:\n{donateUrl}"
+    "donateBody": "Bot ini percuma & dibuat dengan penuh kasih sayang. Sokong pembangun melalui derma:\n{donateUrl}",
+    "nodeDown": "Pelayan muzik tidak tersedia, pemutaran dihentikan.",
+    "nodeSwitched": "Beralih pelayan muzik",
+    "nodeFailoverFailed": "Gagal beralih pelayan muzik, pemutaran dihentikan."
 }

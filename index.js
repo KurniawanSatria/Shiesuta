@@ -31,14 +31,30 @@ Message.prototype.reply = function (options) {
 console.clear();
 
 
-const getTime = () => chalk.bgWhite.black.italic(` ${moment().tz("Asia/Jakarta").format("HH:mm:ss")} `);
-const format = (label, color, msg) => `${getTime()} ${color.bold(`[${label}]`)} ${chalk.gray(msg)}`;
+
+const logDir = path.join(__dirname, "logs");
+fs.mkdirSync(logDir, { recursive: true });
+let logDate = moment().tz("Asia/Jakarta").format("YYYY-MM-DD");
+let logStream = fs.createWriteStream(path.join(logDir, `shiesuta-${logDate}.log`),{ flags: "a" });
+const getTime = () => chalk.bold(chalk.gray(`${moment().tz("Asia/Jakarta").format("YYYY-MM-DD HH:mm:ss")}`));
+const format = (label, color, msg) => `${getTime()} ${color(label)} --- : ${chalk.bold(msg)}`;
 const fmtArgs = (args) => args.map(a => a instanceof Error ? (a.stack ?? a.message) : typeof a === "object" && a !== null ? JSON.stringify(a) : String(a)).join(" ");
+const writeLog = (text) => {
+    console.log(text);
+    const date = moment().tz("Asia/Jakarta").format("YYYY-MM-DD");
+    if (date !== logDate) {
+        logStream.end();
+        logDate = date;
+        logStream = fs.createWriteStream(path.join(logDir, `shiesuta-${logDate}.log`),{ flags: "a" });
+    }
+    const clean = text.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, "");
+    logStream.write(clean + "\n");
+};
 global.log = {
-    info: (...msg) => console.log(format("INFO", chalk.blueBright, fmtArgs(msg))),
-    warn: (...msg) => console.log(format("WARN", chalk.yellowBright, fmtArgs(msg))),
-    error: (...msg) => console.log(format("ERROR", chalk.redBright, fmtArgs(msg))),
-    debug: (...msg) => console.log(format("DEBUG", chalk.greenBright, fmtArgs(msg))),
+    info: (...msg) => writeLog(format("INFO", chalk.blueBright, fmtArgs(msg))),
+    warn: (...msg) => writeLog(format("WARN", chalk.yellowBright, fmtArgs(msg))),
+    error: (...msg) => writeLog(format("ERROR", chalk.redBright, fmtArgs(msg))),
+    debug: (...msg) => writeLog(format("DEBUG", chalk.greenBright, fmtArgs(msg))),
 };
 
 process.on("unhandledRejection", (e) => global.log.error(`Unhandled: ${e?.message ?? e}`));
@@ -100,7 +116,7 @@ const lavalink = new LavalinkManager({
     },
     autoSkip: true,
     autoSkipOnResolveError: true,
-    autoMove: true,
+    autoMove: false,
     emitNewSongsOnly: true,
     client: {
         id: client.user?.id ?? "unknown",
@@ -233,9 +249,13 @@ lavalink.nodeManager
         global.log.info(`Lavalink ${node.id}: Ready!`);
         node.updateSession(true, 360e3).catch((e) => global.log.warn(`Lavalink ${node.id}: session resume setup failed: ${e?.message ?? e}`));
     })
-    .on("disconnect", (node, reason) => {
+    .on("disconnect", async (node, reason) => {
         const affected = [...lavalink.players.values()].filter(p => p?.node?.options?.id === node.id).length;
         global.log.warn(`Lavalink ${node.id}: Disconnected${affected ? ` (${affected} player(s) auto-moving via autoMove)` : ""}, Reason: ${typeof reason === "object" ? JSON.stringify(reason) : reason ?? "No reason"}`);
+        if (affected) {
+            const { handleNodeFailover } = require("./events/lavalink/nodeFailover");
+            await handleNodeFailover({ client, lavalink, commands }, node, reason);
+        }
     })
     .on("reconnecting", (node) => global.log.warn(`Lavalink ${node.id}: Reconnecting...`))
     .on("destroy", (node, reason) => {

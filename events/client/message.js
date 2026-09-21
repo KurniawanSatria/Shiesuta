@@ -2,6 +2,8 @@ const { Events, AttachmentBuilder } = require("discord.js");
 const fs = require("fs");
 const util = require("util");
 const { clearIdle } = require("../../lib/utils");
+const { reply } = require("../../lib/ui");
+const { EMOJI } = require("../../lib/emoji");
 const { T, setLang } = require("../../lib/i18n");
 const cfg = require("../../config.json");
 const db = require("../../lib/db");
@@ -58,7 +60,10 @@ module.exports = {
         clearIdle(m.guild.id);
         const player = ctx.lavalink.getPlayer(m.guild.id);
         const t = T(m.guild.id);
-        await command.run(m, args, { ...ctx, player, t }).catch(e => global.log.error(`Command ${cmd}:`, e));
+        await command.run(m, args, { ...ctx, player, t }).catch(e => {
+            global.log.error(`Command ${cmd}:`, e);
+            m.reply(reply(`### ${EMOJI.error} Error`, t.commandError || "Something went wrong, try again later.")).catch(() => { });
+        });
         if (cfg.cleanMode) setTimeout(() => m.delete().catch(() => { }), 60000);
     }
 };
