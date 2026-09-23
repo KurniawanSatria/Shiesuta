@@ -74,7 +74,7 @@ const cleanMessages = async () => {
     const cutoff = Date.now() - 60000;
     for (const guild of client.guilds.cache.values()) {
         for (const channel of guild.channels.cache.values()) {
-            if (!channel.isTextBased?.() || !channel.messages?.fetch) continue;
+            if (!channel.isTextBased?.() || !channel.messages?.fetch || channel.id === cfg.statusChannelId) continue;
             const messages = await channel.messages.fetch({ limit: 100 }).catch(() => null);
             if (!messages) continue;
             const nowPlayingId = state.npState.get(guild.id)?.msg?.id;
@@ -253,22 +253,35 @@ const watchDir = (dir) => {
 
 
 
+const { sendStatus } = require("./lib/utils");
+const { initStatus, updateStatus } = require("./lib/statusWatcher");
+const nodeNum = (node) => Nodes.findIndex(n => n.id === node.id) + 1 || node.id;
 lavalink.nodeManager
     .on("connect", (node) => {
         global.log.info(`Lavalink ${node.id}: Ready!`);
         node.updateSession(true, 360e3).catch((e) => global.log.warn(`Lavalink ${node.id}: session resume setup failed: ${e?.message ?? e}`));
+        // sendStatus(client, `🟢 **Node ${nodeNum(node)} connected**`);
+        updateStatus(client, lavalink);
     })
     .on("disconnect", async (node, reason) => {
         const affected = [...lavalink.players.values()].filter(p => p?.node?.options?.id === node.id).length;
         global.log.warn(`Lavalink ${node.id}: Disconnected${affected ? ` (${affected} player(s) auto-moving via autoMove)` : ""}, Reason: ${typeof reason === "object" ? JSON.stringify(reason) : reason ?? "No reason"}`);
+        // sendStatus(client, `🔴 **Node ${nodeNum(node)} disconnected** — \`${typeof reason === "object" ? JSON.stringify(reason) : reason ?? "unknown"}\``);
+        updateStatus(client, lavalink, { [node.id]: { online: false } });
         if (affected) {
             const { handleNodeFailover } = require("./events/lavalink/nodeFailover");
             await handleNodeFailover({ client, lavalink, commands }, node, reason);
         }
     })
-    .on("reconnecting", (node) => global.log.warn(`Lavalink ${node.id}: Reconnecting...`))
+    .on("reconnecting", (node) => {
+        global.log.warn(`Lavalink ${node.id}: Reconnecting...`);
+        // sendStatus(client, `🟡 **Node ${nodeNum(node)} reconnecting...**`);
+        updateStatus(client, lavalink, { [node.id]: { online: false } });
+    })
     .on("destroy", (node, reason) => {
         global.log.error(`Lavalink ${node.id}: destroyed (${reason ?? "no reason"}) — re-adding in 30s`);
+        //sendStatus(client, `💀 **Node ${nodeNum(node)} destroyed** — \`${reason ?? "no reason"}\` (re-adding in 30s)`);
+        updateStatus(client, lavalink, { [node.id]: { online: false } });
         const opts = Nodes.find(n => n.id === node.id);
         if (!opts) return;
         setTimeout(() => {
@@ -281,8 +294,16 @@ lavalink.nodeManager
             }
         }, 30000);
     })
-    .on("resumed", (node, payload, players) => global.log.info(`Lavalink ${node.id}: session resumed (${players?.length ?? 0} players)`))
-    .on("error", (node, error) => global.log.error(`Lavalink ${node.id}: ${error?.message ?? error?.error?.message ?? JSON.stringify(error)}`));
+    .on("resumed", (node, payload, players) => {
+        global.log.info(`Lavalink ${node.id}: session resumed (${players?.length ?? 0} players)`);
+        //sendStatus(client, `♻️ **Node ${nodeNum(node)} session resumed** (${players?.length ?? 0} players)`);
+        updateStatus(client, lavalink);
+    })
+    .on("error", (node, error) => {
+        global.log.error(`Lavalink ${node.id}: ${error?.message ?? error?.error?.message ?? JSON.stringify(error)}`);
+        //sendStatus(client, `⚠️ **Node ${nodeNum(node)} error** — \`${error?.message ?? error?.error?.message ?? "unknown"}\``);
+        updateStatus(client, lavalink);
+    });
 
 lavalink.on("debug", (eventKey, eventData) => global.log.info(`Lavalink debug [${eventKey}]:`, eventData));
 
@@ -293,6 +314,8 @@ client.once(Events.ClientReady, async c => {
     lavalink.init({ id: c.user.id, username: c.user.username });
     await cleanMessages();
     global.log.info(`Ready! Logged in as ${c.user.tag}`);
+    setTimeout(() => initStatus(c, lavalink), 5000);
+    setInterval(() => updateStatus(c, lavalink), 30000);
 });
 client.on('error', (error) => global.log.error(`Client error: ${error}`));
 
