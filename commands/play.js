@@ -5,6 +5,22 @@ const db = require("../lib/db");
 const cfg = require("../config.json");
 
 const URL_RE = /^https?:\/\//i;
+const hasValid = (lavalink, result) => Boolean(result && result.loadType !== "error" && (result.tracks ?? []).some(tr => lavalink.utils.isNotBrokenTrack(tr)));
+
+const searchWithFailover = async (lavalink, player, searchQuery, author) => {
+    const result = await player.search(searchQuery, author).catch(() => null);
+    if (hasValid(lavalink, result)) return result;
+    const nodes = [...lavalink.nodeManager.nodes.values()].filter(n => n.connected && n.id !== player.node?.id)
+        .sort((a, b) => (a.stats?.playingPlayers ?? 0) - (b.stats?.playingPlayers ?? 0));
+    for (const node of nodes) {
+        const candidate = await node.search(searchQuery, author).catch(() => null);
+        if (hasValid(lavalink, candidate)) {
+            global.log.warn(`Search failover: ${player.guildId} got results from node ${node.id} (player node ${player.node?.id} returned ${result?.loadType ?? "error"})`);
+            return candidate;
+        }
+    }
+    return result;
+};
 
 module.exports = {
     name: "play",
@@ -36,31 +52,8 @@ module.exports = {
             // configured default search platform (ytmsearch unless configured).
             const defaultPlatform = cfg.searchPlatform ?? cfg.searchPlatfor ?? lavalink.options.playerOptions?.defaultSearchPlatform ?? "ytmsearch";
             const searchQuery = URL_RE.test(query) ? { query } : { query, source: defaultPlatform };
-            let result = await p.search(searchQuery, m.author).catch(() => null);
-            if (!result || result.loadType === "error" || result.loadType === "empty" || !result.tracks?.length) {
-                const oldNode = p.node?.id;
-                try {
-                    const newNode = await p.moveNode();
-                    global.log.warn(`Play search failed on ${m.guild.id}: moved player from ${oldNode} to ${newNode}`);
-                    result = await p.search(searchQuery, m.author).catch(() => null);
-                } catch (error) {
-                    global.log.warn(`Play search failover on ${m.guild.id} failed: ${error?.message ?? error}`);
-                }
-            }
-            if (!result || result.loadType === "error" || result.loadType === "empty" || !result.tracks?.length) return m.reply(reply(`### ${EMOJI.error} Error`, `${t.noResults}`));
-            // Skip broken tracks (no/short duration) per lavalink-client tipps docs.
-            let valid = result.tracks.filter(tr => lavalink.utils.isNotBrokenTrack(tr));
-            if (!valid.length) {
-                const oldNode = p.node?.id;
-                try {
-                    const newNode = await p.moveNode();
-                    global.log.warn(`Play search returned broken tracks on ${m.guild.id}: moved player from ${oldNode} to ${newNode}`);
-                    result = await p.search(searchQuery, m.author).catch(() => null);
-                    valid = result?.tracks?.filter(tr => lavalink.utils.isNotBrokenTrack(tr)) ?? [];
-                } catch (error) {
-                    global.log.warn(`Play broken-track failover on ${m.guild.id} failed: ${error?.message ?? error}`);
-                }
-            }
+            const result = await searchWithFailover(lavalink, p, searchQuery, m.author);
+            const valid = (result?.tracks ?? []).filter(tr => lavalink.utils.isNotBrokenTrack(tr));
             if (!valid.length) return m.reply(reply(`### ${EMOJI.error} Error`, `${t.noResults}`));
             const isPlaylist = result.loadType === "playlist";
             const track = valid[0];

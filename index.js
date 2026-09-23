@@ -253,9 +253,7 @@ const watchDir = (dir) => {
 
 
 
-const { sendStatus } = require("./lib/utils");
 const { initStatus, updateStatus } = require("./lib/statusWatcher");
-const nodeNum = (node) => Nodes.findIndex(n => n.id === node.id) + 1 || node.id;
 lavalink.nodeManager
     .on("connect", (node) => {
         global.log.info(`Lavalink ${node.id}: Ready!`);

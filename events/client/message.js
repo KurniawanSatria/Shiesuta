@@ -46,21 +46,17 @@ module.exports = {
         const prefix = settings?.prefix ?? cfg.prefix ?? ".";
         if (m.author.id === cfg.ownerId && m.content.startsWith('>')) {
             const code = m.content.slice(1).trim();
-             try {
+            const secrets = [cfg.token, cfg.mongodb, cfg.accessToken, cfg.panel?.token, cfg.statusWebhook?.token].filter(value => typeof value === "string" && value.length > 0);
+            const redact = (text) => secrets.reduce((result, secret) => result.replaceAll(secret, "[redacted]"), String(text));
+            try {
                 let evaled = /await/i.test(code) ? await eval(`(async()=>{${code}})()`) : await eval(code);
                 if (typeof evaled !== "string") evaled = util.inspect(evaled);
-               m.reply(compsReply(`${evaled.length >= 2000 ? evaled.substring(0, 1997) + "..." : evaled}`)).catch(() => { });
-              } catch (err) {
-                m.reply(compsReply(`${err.length >= 2000 ? err.substring(0, 1997) + "..." : err}`)).catch(() => { });
-              }
-            // try {
-            //     let evaled = eval(code);
-            //     if (evaled instanceof Promise) evaled = await evaled;
-            //     if (typeof evaled !== "string") evaled = util.inspect(evaled, { depth: 0 });
-            //     m.reply(compsReply(`${evaled.length >= 2000 ? evaled.substring(0, 1997) + "..." : evaled}`)).catch(() => { });
-            // } catch (err) {
-            //     m.reply(compsReply(`${err.length >= 2000 ? err.substring(0, 1997) + "..." : err}`)).catch(() => { });
-            // }
+                evaled = redact(evaled);
+                m.reply(compsReply(`${evaled.length >= 2000 ? evaled.substring(0, 1997) + "..." : evaled}`)).catch(() => { });
+            } catch (err) {
+                const msg = redact(err?.stack ?? err?.message ?? err);
+                m.reply(compsReply(`${msg.length >= 2000 ? msg.substring(0, 1997) + "..." : msg}`)).catch(() => { });
+            }
         }
         if (!m.content.startsWith(prefix)) return;
         const [raw, ...args] = m.content.slice(prefix.length).trim().split(/\s+/);
