@@ -15,7 +15,6 @@ module.exports = {
         const t = T(player.guildId);
         const requester = track.requester?.toString() ?? t.unknown;
         const info = track.info;
-        player.setData("trackErrorFailover", undefined);
         const lyrics = await fetchLyrics({ info });
         const lines = lyrics?.syncedLyrics ? parseLrc(lyrics.syncedLyrics) : [];
         const msg = await channel.send(nowPlayingCard(player.guildId, player, { info }, requester, lines, 0)).catch((e) => global.log.error(`Failed to send now playing message on ${player.guildId} ${player.guild?.name ?? ""}: ${e.message}`));
