@@ -33,6 +33,7 @@ module.exports = {
         const usable = [...lavalink.nodeManager.nodes.values()].some(n => n.connected);
         if (!usable) return m.reply(reply(`### ${EMOJI.error} Error`, t.noNodes || "Music server is offline, try again later."));
         let p = lavalink.getPlayer(m.guild.id);
+        let createdPlayer = false;
         try {
             if (!p) {
                 const settings = await db.get(m.guild.id);
@@ -43,6 +44,7 @@ module.exports = {
                     selfDeaf: true,
                     volume: settings?.volume ?? 80
                 });
+                createdPlayer = true;
                 if (settings?.autoPlay === false) p.setData("autoplay_disabled", true);
             }
             if (!p.connected) await p.connect();
@@ -54,7 +56,10 @@ module.exports = {
             const searchQuery = URL_RE.test(query) ? { query } : { query, source: defaultPlatform };
             const result = await searchWithFailover(lavalink, p, searchQuery, m.author);
             const valid = (result?.tracks ?? []).filter(tr => lavalink.utils.isNotBrokenTrack(tr));
-            if (!valid.length) return m.reply(reply(`### ${EMOJI.error} Error`, `${t.noResults}`));
+            if (!valid.length) {
+                if (createdPlayer) await p.destroy().catch(() => { });
+                return m.reply(reply(`### ${EMOJI.error} Error`, `${t.noResults}`));
+            }
             const isPlaylist = result.loadType === "playlist";
             const track = valid[0];
             if (isPlaylist) await p.queue.add(valid);
@@ -68,8 +73,7 @@ module.exports = {
             return;
         } catch (e) {
             global.log.error(`Play [${m.guild.id}]: ${e?.message ?? e}`);
-            // Don't leave a half-created, silent player behind on failure.
-            if (p && !p.playing && !p.queue?.current) await p.destroy().catch(() => { });
+            if (createdPlayer && p && !p.playing && !p.queue?.current) await p.destroy().catch(() => { });
             return m.reply(reply(`### ${EMOJI.error} Error`, t.playFailed || "Failed to play, try again later.")).catch(() => { });
         }
     }

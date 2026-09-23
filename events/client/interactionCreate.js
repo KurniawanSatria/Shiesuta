@@ -87,8 +87,9 @@ module.exports = {
         }
 
         if (id === "np_autoplay") {
-            const current = player.getData("autoplay_disabled") !== true;
-            player.setData("autoplay_disabled", current);
+            const enable = player.getData("autoplay_disabled") === true;
+            player.setData("autoplay_disabled", !enable);
+            await db.set(interaction.guildId, { autoPlay: enable });
             return interaction.message.edit(nowPlayingCard(interaction.guildId, player, { info: st.track }, st.requester, st.lines, player.position / 1000, st.lyricsVisible)).catch(() => { });
         }
 

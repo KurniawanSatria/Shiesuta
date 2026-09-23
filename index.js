@@ -56,8 +56,12 @@ global.log = {
     error: (...msg) => writeLog(format("ERROR", chalk.redBright, fmtArgs(msg)))
 };
 
-process.on("unhandledRejection", (e) => global.log.error(`Unhandled: ${e?.message ?? e}`));
-process.on("uncaughtException", (e) => global.log.error(`Uncaught: ${e?.message ?? e}`));
+const fatal = (label, error) => {
+    global.log.error(`${label}: ${error?.stack ?? error?.message ?? error}`);
+    logStream.end(() => process.exit(1));
+};
+process.once("unhandledRejection", error => fatal("Unhandled rejection", error));
+process.once("uncaughtException", error => fatal("Uncaught exception", error));
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 

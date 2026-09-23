@@ -1,5 +1,6 @@
 const { EMOJI } = require("../lib/emoji");
 const { reply } = require("../lib/ui");
+const db = require("../lib/db");
 
 module.exports = {
     name: "autoplay",
@@ -9,6 +10,7 @@ module.exports = {
         const current = player.getData("autoplay_disabled") !== true;
         const enable = arg === "on" ? true : arg === "off" ? false : !current;
         player.setData("autoplay_disabled", !enable);
+        await db.set(m.guild.id, { autoPlay: enable });
         return m.reply(reply(`### ${EMOJI.shuffle} Autoplay: ${enable ? "ON" : "OFF"}`, enable ? t.autoplayOnSub : t.autoplayOffSub));
     }
 };
