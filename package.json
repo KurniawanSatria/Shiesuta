@@ -22,9 +22,9 @@
   "author": "KurniawanSatria",
   "private": false,
   "type": "commonjs",
-  "main": "index.js",
+  "main": "start.js",
   "scripts": {
-    "start": "bun index.js",
+    "start": "bun start.js",
     "dev": "bun --watch index.js"
   },
   "engines": {

@@ -2,13 +2,16 @@ const { T } = require("../../lib/i18n");
 const { reply } = require("../../lib/ui");
 const { EMOJI } = require("../../lib/emoji");
 const db = require("../../lib/db");
+const state = require("../../lib/state");
 const cfg = require("../../config.json");
 
 async function findPanelServer(panel, nodeId) {
     const baseUrl = String(panel.url ?? "https://panel.saturia.codes").replace(/\/+$/, "").replace(/\/api$/, "");
-    const res = await fetch(`${baseUrl}/api/client`, { headers: { Authorization: `Bearer ${panel.token}` } });
-    if (!res.ok) throw new Error(`server list returned ${res.status}`);
-    const servers = (await res.json()).data ?? [];
+    const res = await fetch(`${baseUrl}/api/client/servers?page=1&per_page=100&other=false`, { headers: { Authorization: `Bearer ${panel.token}` } });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(`server list returned ${res.status}${body.errors ? `: ${[].concat(body.errors).map(e => e?.detail ?? e?.code ?? e).join(", ")}` : ""}`);
+    const raw = body.servers ?? body.data ?? body;
+    const servers = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : Array.isArray(raw?.servers) ? raw.servers : raw?.attributes ? [raw] : Object.values(typeof raw === "object" && raw ? raw : {}).filter(v => v?.attributes);
     const server = servers.find(({ attributes }) => attributes?.name === nodeId);
     return server?.attributes?.identifier ?? server?.attributes?.uuid ?? null;
 }
@@ -48,13 +51,14 @@ async function restartBackupNode(node) {
 }
 
 async function handleNodeFailover(ctx, node, reason) {
-    await restartBackupNode(node);
+    restartBackupNode(node);
     const affectedPlayers = [...ctx.lavalink.players.values()].filter(p => p.node?.id === node.id);
     if (!affectedPlayers.length) return;
 
     global.log.warn(`Node ${node.id} disconnected, attempting failover for ${affectedPlayers.length} player(s)`);
 
-    const availableNodes = [...ctx.lavalink.nodeManager.nodes.values()].filter(n => n.connected && n.id !== node.id);
+    const availableNodes = [...ctx.lavalink.nodeManager.nodes.values()].filter(n => n.connected && n.id !== node.id)
+        .sort((a, b) => (a.stats?.playingPlayers ?? 0) - (b.stats?.playingPlayers ?? 0));
     if (!availableNodes.length) {
         global.log.error(`Node ${node.id} down — no healthy nodes available for failover`);
         for (const player of affectedPlayers) {
@@ -65,21 +69,28 @@ async function handleNodeFailover(ctx, node, reason) {
         return;
     }
 
+    const load = new Map(availableNodes.map(n => [n.id, n.stats?.playingPlayers ?? 0]));
     for (const player of affectedPlayers) {
         try {
-            const targetNode = availableNodes[0];
+            const targetNode = availableNodes.reduce((a, b) => load.get(a.id) <= load.get(b.id) ? a : b);
+            load.set(targetNode.id, load.get(targetNode.id) + 1);
             const position = player.position;
             const currentTrack = player.queue.current;
             const wasPlaying = player.playing;
+            const wasPaused = player.paused;
+            const repeatMode = player.repeatMode ?? "off";
             const volume = player.volume;
-            const queue = [...player.queue];
+            const queue = player.queue.tracks ?? [];
+            const previous = player.queue.previous ?? [];
             const voiceChannelId = player.voiceChannelId;
             const textChannelId = player.textChannelId;
             const guildId = player.guildId;
 
             global.log.info(`Moving player ${guildId} from ${node.id} to ${targetNode.id} at ${position}ms`);
 
+            state.failoverGuilds.add(guildId);
             await player.destroy("Node failover").catch(() => { });
+            setTimeout(() => state.failoverGuilds.delete(guildId), 15000);
 
             const settings = await db.get(guildId);
             const newPlayer = await ctx.lavalink.createPlayer({
@@ -92,16 +103,19 @@ async function handleNodeFailover(ctx, node, reason) {
             });
 
             if (settings?.autoPlay === false) newPlayer.setData("autoplay_disabled", true);
+            if (previous.length) newPlayer.queue.previous = previous;
+            if (repeatMode !== "off") await newPlayer.setRepeatMode(repeatMode).catch(() => { });
 
             if (currentTrack) {
                 await newPlayer.queue.add(currentTrack);
                 if (wasPlaying) {
                     await newPlayer.play();
                     await newPlayer.seek(position).catch(() => { });
+                    if (wasPaused) await newPlayer.pause();
                 }
             }
 
-            for (const track of queue.slice(1)) {
+            for (const track of queue) {
                 await newPlayer.queue.add(track);
             }
 
@@ -110,7 +124,7 @@ async function handleNodeFailover(ctx, node, reason) {
             const channel = textChannelId ? ctx.client.channels.cache.get(textChannelId) : null;
             const t = T(guildId);
             if (channel && currentTrack) {
-                await channel.send(reply(`### ${EMOJI.skip} ${t.nodeSwitched || "Switched music server"}`, `Resumed **${currentTrack.info.title}** at ${Math.floor(position / 1000)}s`)).catch(() => { });
+                await channel.send(reply(`### ${EMOJI.transfer} ${t.nodeSwitched || "Switched music server"}`, `Resumed **${currentTrack.info.title}** at ${Math.floor(position / 1000)}s`)).catch(() => { });
             }
         } catch (e) {
             global.log.error(`Failover failed for ${player.guildId}: ${e?.message ?? e}`);

@@ -170,7 +170,11 @@ const loadEvents = (dir, emitter, argBuilder) => {
         const e = require(full);
         if (!e.name || typeof e.run !== "function") continue;
         if (e.emitter && e.emitter !== argBuilder.name) continue;
-        emitter[e.once ? "once" : "on"](e.name, (...args) => require(full).run(ctx, ...argBuilder(args)));
+        emitter[e.once ? "once" : "on"](e.name, (...args) => {
+            let mod = e;
+            try { const m = require(full); if (typeof m.run === "function") mod = m; } catch (_) { }
+            return mod.run(ctx, ...argBuilder(args));
+        });
     }
 };
 
@@ -216,7 +220,11 @@ const reloadFile = (dir, file) => {
             const e = require(full);
             if (!e?.name || typeof e.run !== "function") return;
             if (e?.name && !emitter.listenerCount?.(e.name)) {
-                emitter[e.once ? "once" : "on"](e.name, (...args) => require(full).run(ctx, ...args));
+                emitter[e.once ? "once" : "on"](e.name, (...args) => {
+                    let mod = e;
+                    try { const m = require(full); if (typeof m.run === "function") mod = m; } catch (_) { }
+                    return mod.run(ctx, ...args);
+                });
             }
         } catch (_) { }
         global.log.info(`Hot reload: [event] ${file}`);

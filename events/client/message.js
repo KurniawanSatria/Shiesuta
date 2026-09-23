@@ -18,8 +18,19 @@ const ALIASES = {
     lp: "loop", loop: "loop", repeat: "loop",
     sh: "shuffle", shuffle: "shuffle",
     v: "volume", vol: "volume", volume: "volume",
+    f: "filter", filter: "filter",
+    ap: "autoplay", autoplay: "autoplay",
     set: "set", lang: "set",
-    h: "help", help: "help"
+    h: "help", help: "help",
+    seek: "seek",
+    prev: "previous", previous: "previous", back: "previous",
+    replay: "replay", restart: "replay",
+    "247": "247",
+    rm: "remove", remove: "remove",
+    mv: "move", move: "move",
+    ly: "lyrics", lyrics: "lyrics",
+    hist: "history", history: "history",
+    stats: "stats", status: "stats"
 };
 
 const compsReply = (text) => ({ flags: 32768, components: [{ type: 17, components: [{ type: 10, content: text }] }] });

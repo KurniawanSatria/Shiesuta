@@ -11,7 +11,8 @@ module.exports = {
         const errorMessage = payload?.exception?.message ?? payload?.message ?? "unknown";
         global.log.error(`Track error on ${player.guildId} ${player.guild?.name ?? ""}: ${track?.info?.title ?? "unknown"} — ${errorMessage}`);
         const trackKey = track?.info?.identifier ?? track?.info?.uri ?? track?.info?.title;
-        if (trackKey && player.getData("trackErrorFailover") !== trackKey) {
+        const otherNodes = [...ctx.lavalink.nodeManager.nodes.values()].filter(n => n.connected && n.id !== player.node?.id);
+        if (trackKey && otherNodes.length && player.getData("trackErrorFailover") !== trackKey) {
             player.setData("trackErrorFailover", trackKey);
             try {
                 const oldNode = player.node?.id;
